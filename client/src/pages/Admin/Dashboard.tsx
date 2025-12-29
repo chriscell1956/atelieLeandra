@@ -8,17 +8,33 @@ export const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
     const { slides, updateSlide } = useSiteContent();
     const [activeTab, setActiveTab] = useState('overview');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="flex h-[calc(100vh-64px)] bg-wood-50">
+        <div className="flex h-[calc(100vh-64px)] relative">
+            {/* Mobile Sidebar Toggle */}
+            <button
+                className="md:hidden absolute top-4 left-4 z-20 bg-wood-800 text-white p-2 rounded shadow-lg"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            >
+                {isSidebarOpen ? <ArrowLeft size={24} /> : <LayoutDashboard size={24} />}
+            </button>
+
             {/* Sidebar */}
-            <aside className="w-64 bg-wood-800 text-wood-100 hidden md:flex flex-col">
-                <div className="p-6 border-b border-wood-700">
+            <aside className={`
+                w-64 bg-wood-800 text-wood-100 flex-col
+                fixed md:relative z-10 h-full transition-transform duration-300 ease-in-out
+                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+            `}>
+                <div className="p-6 border-b border-wood-700 flex justify-between items-center">
                     <h2 className="text-xl font-bold text-gold-500">Administração</h2>
+                    <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-gray-400 hover:text-white">
+                        <ArrowLeft size={20} />
+                    </button>
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
                     <button
-                        onClick={() => setActiveTab('overview')}
+                        onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }}
                         className={`flex items-center space-x-3 w-full p-3 rounded transition-colors ${activeTab === 'overview' ? 'bg-wood-700 text-gold-400' : 'hover:bg-wood-700/50'}`}
                     >
                         <LayoutDashboard size={20} />
@@ -26,6 +42,7 @@ export const Dashboard: React.FC = () => {
                     </button>
                     <Link
                         to="/admin/produtos"
+                        onClick={() => setIsSidebarOpen(false)}
                         className={`flex items-center space-x-3 w-full p-3 rounded transition-colors hover:bg-wood-700/50`}
                     >
                         <Package size={20} />
@@ -211,13 +228,34 @@ export const Dashboard: React.FC = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-bold text-wood-700 mb-1">URL da Imagem</label>
-                                            <input
-                                                type="text"
-                                                value={slide.image}
-                                                onChange={(e) => updateSlide(slide.id, { image: e.target.value })}
-                                                className="w-full border border-wood-300 rounded p-2 text-gray-600 text-sm font-mono"
-                                            />
+                                            <label className="block text-sm font-bold text-wood-700 mb-1">Imagem do Banner</label>
+                                            <div className="flex items-center space-x-4">
+                                                <div className="w-full h-32 md:w-48 bg-gray-100 rounded border border-gray-300 flex items-center justify-center overflow-hidden relative">
+                                                    {slide.image ? (
+                                                        <img src={slide.image} alt="Preview" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <ImageIcon className="text-gray-400" size={32} />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                const reader = new FileReader();
+                                                                reader.onloadend = () => {
+                                                                    updateSlide(slide.id, { image: reader.result as string });
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            }
+                                                        }}
+                                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-wood-100 file:text-wood-700 hover:file:bg-wood-200 cursor-pointer"
+                                                    />
+                                                    <p className="text-xs text-gray-500 mt-2">Recomendado: Imagens horizontais de alta qualidade.</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

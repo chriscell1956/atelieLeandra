@@ -17,17 +17,12 @@ export const Navbar: React.FC = () => {
                 <div className="flex items-center justify-between h-20">
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center space-x-3">
-                            {/* Logo Image - Using server public or local placeholder if failing */}
                             <img
-                                src="http://localhost:3000/logo.png"
+                                src="/logo.png"
                                 alt="Ateliê Leandra"
                                 className="h-12 w-auto object-contain bg-white/10 rounded p-1"
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                                }}
                             />
-                            <span className="font-bold text-2xl tracking-wider text-gold-500 hidden font-serif italic">
+                            <span className="font-bold text-2xl tracking-wider text-gold-500 font-serif italic">
                                 Ateliê Leandra
                             </span>
                         </Link>

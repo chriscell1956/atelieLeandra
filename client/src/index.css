@@ -4,6 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-wood-50 text-wood-900;
+    background-color: #F5F5F5;
+    background-image: url('/wood-texture.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    @apply text-wood-900;
   }
 }

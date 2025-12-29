@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Image as ImageIcon } from 'lucide-react';
 
 // Types
 interface Product {
@@ -21,6 +21,7 @@ export const ProductManager: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [productData, setProductData] = useState<Partial<Product>>({});
 
     // Mock initial data fetch
     useEffect(() => {
@@ -55,6 +56,7 @@ export const ProductManager: React.FC = () => {
 
     const handleEdit = (product: Product) => {
         setEditingProduct(product);
+        setProductData(product);
         setShowModal(true);
     };
 
@@ -76,39 +78,42 @@ export const ProductManager: React.FC = () => {
         const productionTime = (form.elements.namedItem('productionTime') as HTMLInputElement).value;
         const isHighlight = (form.elements.namedItem('isHighlight') as HTMLInputElement).checked;
 
-        const productData: Partial<Product> = {
+        const productToSave: Product = {
+            id: editingProduct?.id || `MFM${Math.floor(Math.random() * 10000)}`,
             name,
             price,
-            image_url: imageUrl,
+            image_url: imageUrl || 'https://via.placeholder.com/150',
+            category: 'Geral',
             is_highlight: isHighlight,
             description,
             details: {
-                dimensions,
-                productionTime
+                dimensions: dimensions || '',
+                productionTime: productionTime || ''
             }
         };
 
         if (editingProduct) {
             // Edit
-            const updated = { ...editingProduct, ...productData } as Product;
-            setProducts(prev => prev.map(p => p.id === updated.id ? updated : p));
+            setProducts(prev => prev.map(p => p.id === productToSave.id ? productToSave : p));
         } else {
             // New
-            const newProduct: Product = {
-                id: `MFM${Math.floor(Math.random() * 10000)}`,
-                category: 'Geral',
-                name: productData.name!,
-                price: productData.price!,
-                is_highlight: productData.is_highlight!,
-                image_url: productData.image_url || 'https://via.placeholder.com/150',
-                description: productData.description,
-                details: productData.details
-            };
-            setProducts(prev => [newProduct, ...prev]);
+            setProducts(prev => [productToSave, ...prev]);
         }
 
         setShowModal(false);
         setEditingProduct(null);
+        setProductData({}); // Clear form data after save
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProductData(prev => ({ ...prev, image_url: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return (
@@ -116,7 +121,7 @@ export const ProductManager: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-wood-800">Gerenciar Produtos</h1>
                 <button
-                    onClick={() => { setEditingProduct(null); setShowModal(true); }}
+                    onClick={() => { setEditingProduct(null); setProductData({}); setShowModal(true); }}
                     className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
                 >
                     <Plus size={20} />
@@ -124,7 +129,7 @@ export const ProductManager: React.FC = () => {
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow border border-wood-200 overflow-hidden">
+            <div className="bg-white rounded-lg shadow border border-wood-200 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left">
                     <thead className="bg-wood-100 border-b border-wood-200">
                         <tr>
@@ -141,7 +146,13 @@ export const ProductManager: React.FC = () => {
                             <tr key={product.id} className="hover:bg-gray-50">
                                 <td className="p-4">
                                     <img
-                                        src={product.image_url.startsWith('http') || product.image_url.startsWith('stores') ? (product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url) : `http://localhost:3000/${product.image_url}`}
+                                        src={
+                                            product.image_url.startsWith('data:')
+                                                ? product.image_url
+                                                : product.image_url.startsWith('http')
+                                                    ? product.image_url
+                                                    : `http://localhost:3000/${product.image_url}`
+                                        }
                                         alt={product.name}
                                         className="w-12 h-12 rounded object-cover border border-wood-200"
                                         onError={(e) => (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48'}
@@ -186,19 +197,29 @@ export const ProductManager: React.FC = () => {
                                     <input type="text" name="name" defaultValue={editingProduct?.name} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" required />
                                 </div>
 
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">Descrição Detalhada</label>
+                                    <textarea name="description" rows={4} defaultValue={editingProduct?.description} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="Descreva os detalhes da peça, materiais usados, etc."></textarea>
+                                </div>
+
                                 <div>
                                     <label className="block text-sm font-bold text-wood-800 mb-1">Preço (R$)</label>
                                     <input type="number" name="price" step="0.01" defaultValue={editingProduct?.price} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" required />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">URL da Imagem</label>
-                                    <input type="text" name="image" defaultValue={editingProduct?.image_url} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="http://..." />
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Descrição Detalhada</label>
-                                    <textarea name="description" rows={4} defaultValue={editingProduct?.description} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="Descreva os detalhes da peça, materiais usados, etc."></textarea>
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">Categoria</label>
+                                    <select
+                                        name="category"
+                                        defaultValue={editingProduct?.category || "Geral"}
+                                        className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500"
+                                    >
+                                        <option value="Geral">Geral</option>
+                                        <option value="Decoração">Decoração</option>
+                                        <option value="Religioso">Religioso</option>
+                                        <option value="Casamento">Casamento</option>
+                                        <option value="Presentes">Presentes</option>
+                                    </select>
                                 </div>
 
                                 <div>
@@ -210,11 +231,52 @@ export const ProductManager: React.FC = () => {
                                     <label className="block text-sm font-bold text-wood-800 mb-1">Tempo de Produção</label>
                                     <input type="text" name="productionTime" defaultValue={editingProduct?.details?.productionTime} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="Ex: 5 dias úteis" />
                                 </div>
-                            </div>
 
-                            <div className="flex items-center space-x-2 bg-yellow-50 p-3 rounded border border-yellow-200 mt-4">
-                                <input type="checkbox" name="isHighlight" id="destaque" defaultChecked={editingProduct?.is_highlight} className="w-4 h-4 text-wood-600 rounded focus:ring-wood-500" />
-                                <label htmlFor="destaque" className="font-bold text-wood-800 cursor-pointer text-sm">Exibir na Home como Destaque</label>
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">Imagem do Produto</label>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center space-x-4">
+                                            <div className="w-24 h-24 bg-gray-100 rounded border border-gray-300 flex items-center justify-center overflow-hidden">
+                                                {productData?.image_url ? (
+                                                    <img
+                                                        src={
+                                                            productData.image_url.startsWith('data:')
+                                                                ? productData.image_url
+                                                                : productData.image_url.startsWith('http')
+                                                                    ? productData.image_url
+                                                                    : `http://localhost:3000/${productData.image_url}`
+                                                        }
+                                                        alt="Preview"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <ImageIcon className="text-gray-400" size={32} />
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-wood-100 file:text-wood-700 hover:file:bg-wood-200 cursor-pointer"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">Carregue uma foto da galeria ou tire na hora.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center space-x-2 cursor-pointer bg-yellow-50 p-3 rounded border border-yellow-200">
+                                        <input
+                                            type="checkbox"
+                                            name="is_highlight"
+                                            defaultChecked={editingProduct?.is_highlight}
+                                            className="w-4 h-4 text-wood-600 rounded focus:ring-wood-500"
+                                        />
+                                        <span className="font-bold text-wood-800 text-sm">Exibir na Home como Destaque</span>
+                                    </label>
+                                </div>
                             </div>
 
                             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100 mt-6">

@@ -20,8 +20,8 @@ export const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-wood-800 to-wood-600">
-            <div className="bg-wood-50 p-8 rounded-lg shadow-2xl w-full max-w-md border-2 border-wood-400">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-wood-800 to-wood-600 p-4">
+            <div className="bg-wood-50 p-6 md:p-8 rounded-lg shadow-2xl w-full max-w-md border-2 border-wood-400">
                 <h2 className="text-3xl font-bold text-wood-800 text-center mb-8">Painel Admin</h2>
 
                 {error && (
