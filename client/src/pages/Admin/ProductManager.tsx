@@ -9,6 +9,11 @@ interface Product {
     category: string;
     is_highlight: boolean;
     image_url: string;
+    description?: string;
+    details?: {
+        dimensions?: string;
+        productionTime?: string;
+    };
 }
 
 export const ProductManager: React.FC = () => {
@@ -23,8 +28,26 @@ export const ProductManager: React.FC = () => {
         // For now, let's pretend we have data or empty
         setTimeout(() => {
             setProducts([
-                { id: 'MFM10531', name: 'Kit Medalhão NS Guadalupe', price: 52.20, category: 'Geral', is_highlight: true, image_url: 'stores/...' },
-                { id: 'MFM10529', name: 'Combo Projeto 110 Clube', price: 58.90, category: 'Geral', is_highlight: true, image_url: 'stores/...' }
+                {
+                    id: 'MFM10531',
+                    name: 'Kit Medalhão NS Guadalupe',
+                    price: 52.20,
+                    category: 'Geral',
+                    is_highlight: true,
+                    image_url: 'stores/001/977/761/products/2-766ec987f46ddeb0e317655416629878-480-0.webp',
+                    description: 'Kit exclusivo com medalhão detalhado e acabamento premium.',
+                    details: { dimensions: '25cm x 25cm', productionTime: '3 dias úteis' }
+                },
+                {
+                    id: 'MFM10529',
+                    name: 'Combo Projeto 110 Clube',
+                    price: 58.90,
+                    category: 'Geral',
+                    is_highlight: true,
+                    image_url: 'stores/001/977/761/products/2-7085b9e70857452a5317655381200361-480-0.webp',
+                    description: 'Projeto especial para clubes e grupos, feito sob medida.',
+                    details: { dimensions: '30cm x 20cm', productionTime: '5 dias úteis' }
+                }
             ]);
             setIsLoading(false);
         }, 1000);
@@ -44,40 +67,42 @@ export const ProductManager: React.FC = () => {
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (editingProduct) {
-            // Updating existing product
-            if (editingProduct.id.startsWith('new-')) {
-                // It was a new product being edited? (Wait, flow is new -> modal -> save)
-                // Just update the list
-                setProducts(prev => prev.map(p => p.id === editingProduct.id ? editingProduct : p));
-            } else {
-                setProducts(prev => prev.map(p => p.id === editingProduct.id ? editingProduct : p));
-            }
-        } else {
-            // Creating new product - logic handled via form state usually, 
-            // but here we are using editingProduct as the form state container for simplicity in this mock
-        }
-
-        // Actually, let's fix the form binding. The inputs are using defaultValue, so we need to grab values from the form.
         const form = e.target as HTMLFormElement;
         const name = (form.elements.namedItem('name') as HTMLInputElement).value;
         const price = parseFloat((form.elements.namedItem('price') as HTMLInputElement).value);
         const imageUrl = (form.elements.namedItem('image') as HTMLInputElement).value;
+        const description = (form.elements.namedItem('description') as HTMLTextAreaElement).value;
+        const dimensions = (form.elements.namedItem('dimensions') as HTMLInputElement).value;
+        const productionTime = (form.elements.namedItem('productionTime') as HTMLInputElement).value;
         const isHighlight = (form.elements.namedItem('isHighlight') as HTMLInputElement).checked;
 
-        if (editingProduct && !editingProduct.id.startsWith('temp')) {
+        const productData: Partial<Product> = {
+            name,
+            price,
+            image_url: imageUrl,
+            is_highlight: isHighlight,
+            description,
+            details: {
+                dimensions,
+                productionTime
+            }
+        };
+
+        if (editingProduct) {
             // Edit
-            const updated = { ...editingProduct, name, price, image_url: imageUrl, is_highlight: isHighlight };
+            const updated = { ...editingProduct, ...productData } as Product;
             setProducts(prev => prev.map(p => p.id === updated.id ? updated : p));
         } else {
             // New
             const newProduct: Product = {
                 id: `MFM${Math.floor(Math.random() * 10000)}`,
-                name,
-                price,
-                image_url: imageUrl || 'https://via.placeholder.com/150',
                 category: 'Geral',
-                is_highlight: isHighlight
+                name: productData.name!,
+                price: productData.price!,
+                is_highlight: productData.is_highlight!,
+                image_url: productData.image_url || 'https://via.placeholder.com/150',
+                description: productData.description,
+                details: productData.details
             };
             setProducts(prev => [newProduct, ...prev]);
         }
@@ -106,6 +131,7 @@ export const ProductManager: React.FC = () => {
                             <th className="p-4 font-bold text-wood-700">Imagem</th>
                             <th className="p-4 font-bold text-wood-700">Nome</th>
                             <th className="p-4 font-bold text-wood-700">Preço</th>
+                            <th className="p-4 font-bold text-wood-700">Detalhes</th>
                             <th className="p-4 font-bold text-wood-700">Destaque</th>
                             <th className="p-4 font-bold text-wood-700">Ações</th>
                         </tr>
@@ -114,10 +140,18 @@ export const ProductManager: React.FC = () => {
                         {products.map(product => (
                             <tr key={product.id} className="hover:bg-gray-50">
                                 <td className="p-4">
-                                    <div className="w-12 h-12 bg-wood-200 rounded flex items-center justify-center text-xs text-wood-600">Img</div>
+                                    <img
+                                        src={product.image_url.startsWith('http') || product.image_url.startsWith('stores') ? (product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url) : `http://localhost:3000/${product.image_url}`}
+                                        alt={product.name}
+                                        className="w-12 h-12 rounded object-cover border border-wood-200"
+                                        onError={(e) => (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48'}
+                                    />
                                 </td>
                                 <td className="p-4 font-medium">{product.name}</td>
                                 <td className="p-4">R$ {product.price.toFixed(2)}</td>
+                                <td className="p-4 text-sm text-gray-500 max-w-xs truncate">
+                                    {product.details?.dimensions || '-'}
+                                </td>
                                 <td className="p-4">
                                     {product.is_highlight ?
                                         <span className="bg-gold-400/20 text-wood-800 px-2 py-1 rounded text-xs font-bold border border-gold-400">SIM</span>
@@ -139,37 +173,53 @@ export const ProductManager: React.FC = () => {
 
             {/* Modal de Edição/Criação */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden animate-fade-in relative">
-                        <div className="bg-wood-700 text-white p-4 flex justify-between items-center">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl animate-fade-in relative my-8">
+                        <div className="bg-wood-700 text-white p-4 flex justify-between items-center rounded-t-lg">
                             <h2 className="text-xl font-bold">{editingProduct ? 'Editar Produto' : 'Novo Produto'}</h2>
                             <button onClick={() => setShowModal(false)} className="hover:bg-wood-600 p-1 rounded"><X size={24} /></button>
                         </div>
                         <form onSubmit={handleSave} className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="md:col-span-2">
                                     <label className="block text-sm font-bold text-wood-800 mb-1">Nome do Produto</label>
-                                    <input type="text" name="name" defaultValue={editingProduct?.name} className="w-full border border-wood-300 rounded p-2" required />
+                                    <input type="text" name="name" defaultValue={editingProduct?.name} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" required />
                                 </div>
+
                                 <div>
                                     <label className="block text-sm font-bold text-wood-800 mb-1">Preço (R$)</label>
-                                    <input type="number" name="price" step="0.01" defaultValue={editingProduct?.price} className="w-full border border-wood-300 rounded p-2" required />
+                                    <input type="number" name="price" step="0.01" defaultValue={editingProduct?.price} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" required />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">URL da Imagem</label>
+                                    <input type="text" name="image" defaultValue={editingProduct?.image_url} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="http://..." />
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">Descrição Detalhada</label>
+                                    <textarea name="description" rows={4} defaultValue={editingProduct?.description} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="Descreva os detalhes da peça, materiais usados, etc."></textarea>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">Dimensões (Ex: 30x20cm)</label>
+                                    <input type="text" name="dimensions" defaultValue={editingProduct?.details?.dimensions} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">Tempo de Produção</label>
+                                    <input type="text" name="productionTime" defaultValue={editingProduct?.details?.productionTime} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="Ex: 5 dias úteis" />
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-bold text-wood-800 mb-1">URL da Imagem</label>
-                                <input type="text" name="image" defaultValue={editingProduct?.image_url} className="w-full border border-wood-300 rounded p-2" />
+                            <div className="flex items-center space-x-2 bg-yellow-50 p-3 rounded border border-yellow-200 mt-4">
+                                <input type="checkbox" name="isHighlight" id="destaque" defaultChecked={editingProduct?.is_highlight} className="w-4 h-4 text-wood-600 rounded focus:ring-wood-500" />
+                                <label htmlFor="destaque" className="font-bold text-wood-800 cursor-pointer text-sm">Exibir na Home como Destaque</label>
                             </div>
 
-                            <div className="flex items-center space-x-2 bg-yellow-50 p-3 rounded border border-yellow-200">
-                                <input type="checkbox" name="isHighlight" id="destaque" defaultChecked={editingProduct?.is_highlight} className="w-4 h-4 text-wood-600" />
-                                <label htmlFor="destaque" className="font-bold text-wood-800 cursor-pointer">Marcar como Destaque / Oferta</label>
-                            </div>
-
-                            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
-                                <button type="submit" className="px-4 py-2 bg-wood-600 text-white rounded hover:bg-wood-700 font-bold shadow">Salvar Produto</button>
+                            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100 mt-6">
+                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded md:w-auto w-full">Cancelar</button>
+                                <button type="submit" className="px-6 py-2 bg-wood-600 text-white rounded hover:bg-wood-700 font-bold shadow md:w-auto w-full">Salvar Produto</button>
                             </div>
                         </form>
                     </div>

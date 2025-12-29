@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Users, Power, Settings, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useSiteContent } from '../../context/SiteContentContext';
 import { Link } from 'react-router-dom';
 
 export const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
+    const { slides, updateSlide } = useSiteContent();
     const [activeTab, setActiveTab] = useState('overview');
 
     return (
@@ -30,6 +32,13 @@ export const Dashboard: React.FC = () => {
                         <span>Produtos</span>
                     </Link>
                     <button
+                        onClick={() => setActiveTab('carousel')}
+                        className={`flex items-center space-x-3 w-full p-3 rounded transition-colors ${activeTab === 'carousel' ? 'bg-wood-700 text-gold-400' : 'hover:bg-wood-700/50'}`}
+                    >
+                        <ImageIcon size={20} />
+                        <span>Destaques (Carrossel)</span>
+                    </button>
+                    <button
                         onClick={() => setActiveTab('clients')}
                         className={`flex items-center space-x-3 w-full p-3 rounded transition-colors ${activeTab === 'clients' ? 'bg-wood-700 text-gold-400' : 'hover:bg-wood-700/50'}`}
                     >
@@ -39,10 +48,6 @@ export const Dashboard: React.FC = () => {
                     <button className="flex items-center space-x-3 w-full p-3 rounded transition-colors hover:bg-wood-700/50 opacity-50 cursor-not-allowed">
                         <ShoppingCart size={20} />
                         <span>Pedidos (Em breve)</span>
-                    </button>
-                    <button className="flex items-center space-x-3 w-full p-3 rounded transition-colors hover:bg-wood-700/50 opacity-50 cursor-not-allowed">
-                        <Settings size={20} />
-                        <span>Configurações</span>
                     </button>
                 </nav>
                 <div className="p-4 border-t border-wood-700">
@@ -62,7 +67,7 @@ export const Dashboard: React.FC = () => {
                 <header className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-wood-900">
-                            {activeTab === 'overview' ? 'Visão Geral' : 'Gerenciar Clientes'}
+                            {activeTab === 'overview' ? 'Visão Geral' : activeTab === 'clients' ? 'Gerenciar Clientes' : 'Gerenciar Destaques'}
                         </h1>
                         <p className="text-wood-600">Bem-vinda, {user?.name}!</p>
                     </div>
@@ -157,6 +162,67 @@ export const Dashboard: React.FC = () => {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                )}
+
+                {activeTab === 'carousel' && (
+                    <div className="space-y-6">
+                        <div className="bg-yellow-50 border-l-4 border-gold-500 p-4 rounded shadow-sm">
+                            <p className="text-wood-800 font-medium">Aqui você pode editar as imagens e textos que aparecem no topo do site.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6">
+                            {slides.map((slide, index) => (
+                                <div key={slide.id} className="bg-white rounded-lg shadow border border-wood-200 overflow-hidden flex flex-col md:flex-row">
+                                    <div className="w-full md:w-1/3 h-48 md:h-auto relative bg-gray-100">
+                                        <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+                                        <div className="absolute top-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs font-bold">Slide {index + 1}</div>
+                                    </div>
+                                    <div className="p-6 flex-1 space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-bold text-wood-700 mb-1">Título Principal</label>
+                                                <input
+                                                    type="text"
+                                                    value={slide.title}
+                                                    onChange={(e) => updateSlide(slide.id, { title: e.target.value })}
+                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900 font-serif"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-bold text-wood-700 mb-1">Texto do Botão</label>
+                                                <input
+                                                    type="text"
+                                                    value={slide.cta}
+                                                    onChange={(e) => updateSlide(slide.id, { cta: e.target.value })}
+                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-wood-700 mb-1">Subtítulo</label>
+                                            <input
+                                                type="text"
+                                                value={slide.subtitle}
+                                                onChange={(e) => updateSlide(slide.id, { subtitle: e.target.value })}
+                                                className="w-full border border-wood-300 rounded p-2 text-wood-900"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-wood-700 mb-1">URL da Imagem</label>
+                                            <input
+                                                type="text"
+                                                value={slide.image}
+                                                onChange={(e) => updateSlide(slide.id, { image: e.target.value })}
+                                                className="w-full border border-wood-300 rounded p-2 text-gray-600 text-sm font-mono"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </main>

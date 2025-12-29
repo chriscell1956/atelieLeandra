@@ -1,27 +1,12 @@
+
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSiteContent } from '../context/SiteContentContext';
 
 export const HeroCarousel: React.FC = () => {
+    const { slides } = useSiteContent();
     const [currentSlide, setCurrentSlide] = useState(0);
-
-    // Mock slides for now
-    const slides = [
-        {
-            id: 1,
-            title: "Artesanato com Amor",
-            subtitle: "Peças exclusivas feitas à mão para você",
-            image: "https://images.unsplash.com/photo-1499893903130-48d7ad45e69e?q=80&w=1950&auto=format&fit=crop", // Wedding/Crafts wood style
-            cta: "Ver coleção"
-        },
-        {
-            id: 2,
-            title: "Fé e Devoção",
-            subtitle: "Kits e peças religiosas montadas com carinho",
-            image: "https://images.unsplash.com/photo-1549416802-39bd93282eb1?q=80&w=1950&auto=format&fit=crop", // Religious angel/statue
-            cta: "Confira as ofertas"
-        }
-    ];
 
     const nextSlide = () => {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -41,7 +26,7 @@ export const HeroCarousel: React.FC = () => {
             {slides.map((slide, index) => (
                 <div
                     key={slide.id}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute inset - 0 transition - opacity duration - 1000 ease -in -out ${index === currentSlide ? 'opacity-100' : 'opacity-0'} `}
                 >
                     <div className="absolute inset-0 bg-black/40 z-10" />
                     <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />

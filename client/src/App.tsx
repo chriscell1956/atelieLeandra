@@ -10,29 +10,33 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 
 import { CartProvider } from './context/CartContext';
 
+import { SiteContentProvider } from './context/SiteContentContext';
+
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
-          <div className="min-h-screen bg-wood-50 font-sans text-wood-900">
-            <Navbar />
-            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/carrinho" element={<CartPage />} />
-                <Route path="/produtos" element={<div className="p-4">Produtos (Em breve)</div>} />
+        <SiteContentProvider>
+          <Router>
+            <div className="min-h-screen bg-wood-50 font-sans text-wood-900">
+              <Navbar />
+              <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/carrinho" element={<CartPage />} />
+                  <Route path="/produtos" element={<div className="p-4">Produtos (Em breve)</div>} />
 
-                {/* Admin Routes */}
-                <Route path="/admin" element={<ProtectedRoute />}>
-                  <Route index element={<Dashboard />} />
-                  <Route path="produtos" element={<ProductManager />} />
-                </Route>
-              </Routes>
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<ProtectedRoute />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="produtos" element={<ProductManager />} />
+                  </Route>
+                </Routes>
+              </div>
             </div>
-          </div>
-        </Router>
+          </Router>
+        </SiteContentProvider>
       </CartProvider>
     </AuthProvider>
   );

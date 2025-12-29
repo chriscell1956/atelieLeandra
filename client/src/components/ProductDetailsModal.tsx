@@ -55,14 +55,14 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                                 <Ruler className="text-wood-600" />
                                 <div>
                                     <p className="text-xs text-wood-500 font-bold uppercase">Dimensões</p>
-                                    <p className="text-sm font-semibold text-wood-800">{product.details?.dimensions || "20cm x 15cm"}</p>
+                                    <p className="text-sm font-semibold text-wood-800">{product.details?.dimensions || "Não informada"}</p>
                                 </div>
                             </div>
                             <div className="bg-wood-50 p-3 rounded flex items-center space-x-3">
                                 <Clock className="text-wood-600" />
                                 <div>
                                     <p className="text-xs text-wood-500 font-bold uppercase">Produção</p>
-                                    <p className="text-sm font-semibold text-wood-800">{product.details?.productionTime || "5 dias úteis"}</p>
+                                    <p className="text-sm font-semibold text-wood-800">{product.details?.productionTime || "Pronta entrega"}</p>
                                 </div>
                             </div>
                         </div>
