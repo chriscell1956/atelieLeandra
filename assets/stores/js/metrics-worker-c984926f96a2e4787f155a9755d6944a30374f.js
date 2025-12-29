@@ -1,0 +1,1 @@
+self.addEventListener("message",(async e=>{try{const{body:r,referrer:t}=e.data;await fetch(location.origin+"/collect/",{method:"post",body:JSON.stringify(r),headers:{"Content-Type":"application/json"},referrer:t})}catch(e){console.error(e)}}),!1);

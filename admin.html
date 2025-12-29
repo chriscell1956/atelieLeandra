@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Feita Mão (Gerador Vercel/GitHub)</title>
+    <!-- Carregar Banco de Dados Atual -->
+    <script src="produtos.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f4f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #5D4037;
+            text-align: center;
+        }
+
+        .alert {
+            background: #FFF3CD;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #FFEMBA;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #8D6E63;
+            color: white;
+            border: none;
+            margin-top: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #5D4037;
+        }
+
+        .btn-download {
+            background: #28a745;
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .btn-download:hover {
+            background: #218838;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            width: auto;
+            margin: 0 5px;
+            font-size: 12px;
+        }
+
+        .btn-del {
+            background: #dc3545;
+        }
+
+        .btn-edit {
+            background: #007bff;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #EFEBE9;
+            color: #5D4037;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        img.preview {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Gerenciar Produtos (Modo Vercel)</h1>
+
+        <div class="alert">
+            <strong>Como funciona:</strong>
+            1. Cadastre ou edite seus produtos aqui.
+            2. Clique em <strong>"BAIXAR PRODUTOS.JS"</strong> no final da página.
+            3. Substitua o arquivo <code>produtos.js</code> na pasta do seu site pelo novo que você baixou.
+            4. Suba para o GitHub/Vercel.
+        </div>
+
+        <form id="productForm">
+            <input type="hidden" id="pId">
+
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 2;">
+                    <label>Nome do Produto</label>
+                    <input type="text" id="nome" required placeholder="Ex: Bolsa de Crochê">
+                </div>
+                <div style="flex: 1;">
+                    <label>Preço (R$)</label>
+                    <input type="text" id="preco" required placeholder="150,00">
+                </div>
+            </div>
+
+            <label>Categoria</label>
+            <select id="categoria">
+                <option value="Bolsas">Bolsas</option>
+                <option value="Decoração">Decoração</option>
+                <option value="Acessórios">Acessórios</option>
+                <option value="Roupas">Roupas</option>
+                <option value="Kits">Kits Faça Você Mesmo</option>
+                <option value="Cursos">Cursos e Materiais</option>
+            </select>
+
+            <label>Imagem</label>
+            <input type="file" id="imagem" accept="image/*">
+            <p style="font-size: 12px; color: #888;">* Imagens serão otimizadas automaticamente.</p>
+
+            <div style="margin-top: 15px;">
+                <label style="display: inline-flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="destaque" style="width: auto; margin: 0 10px 0 0;">
+                    ⭐ Produto em Destaque
+                </label>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn">Adicionar à Lista</button>
+            <button type="button" id="btnCancel" class="btn" style="background: #ccc; display: none;"
+                onclick="resetForm()">Cancelar</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Cat.</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaProdutos"></tbody>
+        </table>
+
+        <hr>
+
+        <button onclick="downloadDB()" class="btn btn-download">
+            ⬇️ BAIXAR PRODUTOS.JS (Atualizado)
+        </button>
+    </div>
+
+    <script>
+        // Carrega dados iniciais do arquivo products.js ou inicia vazio
+        let produtos = window.produtos_db || [];
+        let isEditing = false;
+
+        document.addEventListener('DOMContentLoaded', renderTable);
+
+        document.getElementById('productForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nome').value;
+            const preco = document.getElementById('preco').value;
+            const categoria = document.getElementById('categoria').value;
+            const destaque = document.getElementById('destaque').checked;
+            const id = document.getElementById('pId').value;
+            const imagemInput = document.getElementById('imagem');
+
+            const processSave = (imgBase64) => {
+                if (id) {
+                    // Editar
+                    const index = produtos.findIndex(p => p.id == id);
+                    if (index !== -1) {
+                        produtos[index] = {
+                            ...produtos[index],
+                            nome, preco, categoria, destaque,
+                            imagem: imgBase64 || produtos[index].imagem // Mantém antiga se não trocar
+                        };
+                    }
+                } else {
+                    // Novo
+                    produtos.unshift({
+                        id: Date.now(),
+                        nome, preco, categoria, destaque,
+                        imagem: imgBase64 || ""
+                    });
+                }
+                resetForm();
+                renderTable();
+                alert('Produto adicionado à lista! Lembre-se de baixar o arquivo no final.');
+            };
+
+            if (imagemInput.files && imagemInput.files[0]) {
+                redimensionarImagem(imagemInput.files[0], processSave);
+            } else {
+                processSave(null);
+            }
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('listaProdutos');
+            tbody.innerHTML = '';
+            produtos.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td>${p.imagem ? `<img src="${p.imagem}" class="preview">` : 'Sem'}</td>
+                <td>${p.nome} ${p.destaque ? '⭐' : ''}</td>
+                <td>R$ ${p.preco}</td>
+                <td>${p.categoria}</td>
+                <td>
+                    <button class="btn btn-action btn-edit" onclick='editProduct(${p.id})'>Edit</button>
+                    <button class="btn btn-action btn-del" onclick="deleteProduct(${p.id})">X</button>
+                </td>
+            `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.editProduct = function (id) {
+            const p = produtos.find(i => i.id == id);
+            if (p) {
+                document.getElementById('pId').value = p.id;
+                document.getElementById('nome').value = p.nome;
+                document.getElementById('preco').value = p.preco;
+                document.getElementById('categoria').value = p.categoria;
+                document.getElementById('destaque').checked = p.destaque;
+
+                document.getElementById('btnSubmit').textContent = 'Salvar Alterações';
+                document.getElementById('btnCancel').style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+        };
+
+        window.deleteProduct = function (id) {
+            if (confirm('Remover produto?')) {
+                produtos = produtos.filter(p => p.id != id);
+                renderTable();
+            }
+        };
+
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('pId').value = '';
+            document.getElementById('btnSubmit').textContent = 'Adicionar à Lista';
+            document.getElementById('btnCancel').style.display = 'none';
+            isEditing = false;
+        }
+
+        // Função de Download do Arquivo JS
+        window.downloadDB = function () {
+            const content = "window.produtos_db = " + JSON.stringify(produtos, null, 4) + ";";
+            const blob = new Blob([content], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'products.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            alert('Arquivo products.js baixado!\nsubstitua o arquivo antigo na sua pasta e suba para o GitHub/Vercel.');
+        };
+
+        // Compressão de Imagem
+        function redimensionarImagem(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX = 600;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+                    else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+                    canvas.width = w; canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+
+</body>
+
+</html>
