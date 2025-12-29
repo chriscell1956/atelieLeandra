@@ -388,11 +388,17 @@
         }
 
         /* Wood/MDF Theme - Gradient Style */
+        html,
         body {
             overflow: auto !important;
+            height: auto !important;
+            /* Allow growing */
+            min-height: 100% !important;
+            margin: 0 !important;
+
             /* Gradient simulating wood essence (Darker to lighter brown) */
-            background: linear-gradient(135deg, #5d4037 0%, #8d6e63 100%);
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #5d4037 0%, #8d6e63 100%) !important;
+            background-attachment: fixed !important;
             color: #3e2723;
             /* Dark brown text for contrast */
         }
