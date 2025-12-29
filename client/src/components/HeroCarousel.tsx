@@ -11,14 +11,14 @@ export const HeroCarousel: React.FC = () => {
             id: 1,
             title: "Artesanato com Amor",
             subtitle: "Peças exclusivas feitas à mão para você",
-            image: "https://images.unsplash.com/photo-1459745930869-b3d0d72c3cbb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80", // Placeholder wood art
+            image: "https://images.unsplash.com/photo-1499893903130-48d7ad45e69e?q=80&w=1950&auto=format&fit=crop", // Wedding/Crafts wood style
             cta: "Ver coleção"
         },
         {
             id: 2,
-            title: "Decoração Religiosa",
-            subtitle: "Kits e peças montadas com devoção",
-            image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80", // Placeholder
+            title: "Fé e Devoção",
+            subtitle: "Kits e peças religiosas montadas com carinho",
+            image: "https://images.unsplash.com/photo-1549416802-39bd93282eb1?q=80&w=1950&auto=format&fit=crop", // Religious angel/statue
             cta: "Confira as ofertas"
         }
     ];

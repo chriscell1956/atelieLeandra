@@ -1,37 +1,67 @@
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, Instagram } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 export const Navbar: React.FC = () => {
     const [isOpen, setIsOpen] = React.useState(false);
     const { items } = useCart();
+    const { user, logout } = useAuth();
 
     const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
         <nav className="bg-wood-800 text-wood-50 shadow-lg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+                <div className="flex items-center justify-between h-20">
                     <div className="flex items-center">
-                        <Link to="/" className="font-bold text-2xl tracking-wider text-gold-500">
-                            Ateliê Leandra
+                        <Link to="/" className="flex items-center space-x-3">
+                            {/* Logo Image - Using server public or local placeholder if failing */}
+                            <img
+                                src="http://localhost:3000/logo.png"
+                                alt="Ateliê Leandra"
+                                className="h-12 w-auto object-contain bg-white/10 rounded p-1"
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                }}
+                            />
+                            <span className="font-bold text-2xl tracking-wider text-gold-500 hidden font-serif italic">
+                                Ateliê Leandra
+                            </span>
                         </Link>
                     </div>
                     <div className="hidden md:block">
-                        <div className="ml-10 flex items-baseline space-x-4">
+                        <div className="ml-10 flex items-center space-x-4">
                             <Link to="/" className="hover:bg-wood-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Início</Link>
                             <Link to="/produtos" className="hover:bg-wood-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Produtos</Link>
                             <Link to="/sobre" className="hover:bg-wood-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Sobre</Link>
                             <Link to="/contato" className="hover:bg-wood-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contato</Link>
-                            <Link to="/admin" className="hover:bg-wood-700 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gold-400">Admin</Link>
+
+                            {/* Conditional Admin Link */}
+                            {user && user.role === 'admin' ? (
+                                <Link to="/admin" className="bg-gold-500/10 border border-gold-500/50 hover:bg-gold-500/20 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gold-400">Admin</Link>
+                            ) : null}
                         </div>
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6 space-x-4">
-                            <button className="p-1 rounded-full hover:bg-wood-700 focus:outline-none transition-colors">
-                                <User className="h-6 w-6" />
-                            </button>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-full hover:text-pink-400 transition-colors" title="Siga-nos no Instagram">
+                                <Instagram className="h-6 w-6" />
+                            </a>
+
+                            {user ? (
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-sm text-gold-200">Olá, {user.name}</span>
+                                    <button onClick={logout} className="text-xs border border-wood-500 px-2 py-1 rounded hover:bg-wood-700">Sair</button>
+                                </div>
+                            ) : (
+                                <Link to="/login" className="p-1 rounded-full hover:bg-wood-700 focus:outline-none transition-colors" title="Login Administrativo">
+                                    <User className="h-6 w-6" />
+                                </Link>
+                            )}
+
                             <Link to="/carrinho" className="p-1 rounded-full hover:bg-wood-700 focus:outline-none transition-colors relative">
                                 <ShoppingCart className="h-6 w-6" />
                                 {itemCount > 0 && (
