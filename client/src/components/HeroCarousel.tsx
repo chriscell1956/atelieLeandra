@@ -1,12 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-interface Product {
-    id: string;
-    name: string;
-    price: number;
-    image_url: string;
-}
 
 export const HeroCarousel: React.FC = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
