@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X, Image as ImageIcon } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 // Types
 interface Product {
@@ -24,66 +25,46 @@ export const ProductManager: React.FC = () => {
     const [productData, setProductData] = useState<Partial<Product>>({});
 
     // Mock initial data fetch
+    // Fetch from Supabase on mount
     useEffect(() => {
-        // In real app, fetch from API
-        // For now, let's pretend we have data or empty
-        setTimeout(() => {
-            setProducts([
-                {
-                    id: 'MFM10531',
-                    name: 'Kit Medalhão NS Guadalupe',
-                    price: 52.20,
-                    category: 'Geral',
-                    is_highlight: true,
-                    image_url: 'stores/001/977/761/products/2-766ec987f46ddeb0e317655416629878-480-0.webp',
-                    description: 'Kit exclusivo com medalhão detalhado e acabamento premium.',
-                    details: { dimensions: '25cm x 25cm', productionTime: '3 dias úteis' }
-                },
-                {
-                    id: 'MFM10529',
-                    name: 'Combo Projeto 110 Clube',
-                    price: 58.90,
-                    category: 'Geral',
-                    is_highlight: true,
-                    image_url: 'stores/001/977/761/products/2-7085b9e70857452a5317655381200361-480-0.webp',
-                    description: 'Projeto especial para clubes e grupos, feito sob medida.',
-                    details: { dimensions: '30cm x 20cm', productionTime: '5 dias úteis' }
-                }
-            ]);
-            setIsLoading(false);
-        }, 1000);
+        fetchProducts();
     }, []);
 
-    const handleEdit = (product: Product) => {
-        setEditingProduct(product);
-        setProductData(product);
-        setShowModal(true);
-    };
+    const fetchProducts = async () => {
+        setIsLoading(true);
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    const handleDelete = (id: string) => {
-        if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-            setProducts(products.filter(p => p.id !== id));
+        if (error) {
+            console.error('Error fetching products:', error);
+            // Fallback or alert?
+        } else {
+            setProducts(data || []);
         }
+        setIsLoading(false);
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const form = e.target as HTMLFormElement;
         const name = (form.elements.namedItem('name') as HTMLInputElement).value;
         const price = parseFloat((form.elements.namedItem('price') as HTMLInputElement).value);
-        const imageUrl = (form.elements.namedItem('image') as HTMLInputElement).value;
+        const category = (form.elements.namedItem('category') as HTMLSelectElement).value;
+        const imageUrl = (form.elements.namedItem('image') as HTMLInputElement).value || productData.image_url;
         const description = (form.elements.namedItem('description') as HTMLTextAreaElement).value;
         const dimensions = (form.elements.namedItem('dimensions') as HTMLInputElement).value;
         const productionTime = (form.elements.namedItem('productionTime') as HTMLInputElement).value;
-        const isHighlight = (form.elements.namedItem('isHighlight') as HTMLInputElement).checked;
+        const isHighlight = (form.elements.namedItem('is_highlight') as HTMLInputElement).checked;
 
-        const productToSave: Product = {
-            id: editingProduct?.id || `MFM${Math.floor(Math.random() * 10000)}`,
+        const productToSave = {
+            id: editingProduct?.id || crypto.randomUUID(), // Ensure ID generation
             name,
             price,
             image_url: imageUrl || 'https://via.placeholder.com/150',
-            category: 'Geral',
+            category,
             is_highlight: isHighlight,
             description,
             details: {
@@ -92,17 +73,39 @@ export const ProductManager: React.FC = () => {
             }
         };
 
-        if (editingProduct) {
-            // Edit
-            setProducts(prev => prev.map(p => p.id === productToSave.id ? productToSave : p));
-        } else {
-            // New
-            setProducts(prev => [productToSave, ...prev]);
-        }
+        const { error } = await supabase
+            .from('products')
+            .upsert(productToSave);
 
-        setShowModal(false);
-        setEditingProduct(null);
-        setProductData({}); // Clear form data after save
+        if (error) {
+            alert('Erro ao salvar produto: ' + error.message);
+        } else {
+            fetchProducts(); // Refresh list
+            setShowModal(false);
+            setEditingProduct(null);
+            setProductData({});
+        }
+    };
+
+    const handleEdit = (product: Product) => {
+        setEditingProduct(product);
+        setProductData(product);
+        setShowModal(true);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm('Tem certeza que deseja excluir este produto?')) {
+            const { error } = await supabase
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Erro ao excluir: ' + error.message);
+            } else {
+                fetchProducts();
+            }
+        }
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

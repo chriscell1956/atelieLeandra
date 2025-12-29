@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 export interface CarouselSlide {
     id: number;
@@ -20,34 +21,54 @@ const SiteContentContext = createContext<SiteContentContextType | undefined>(und
 
 export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     // Initial Mock Data
-    const [slides, setSlides] = useState<CarouselSlide[]>([
-        {
-            id: 1,
-            title: "Artesanato com Amor",
-            subtitle: "Peças exclusivas feitas à mão para você",
-            image: "https://images.unsplash.com/photo-1499893903130-48d7ad45e69e?q=80&w=1950&auto=format&fit=crop",
-            cta: "Ver coleção"
-        },
-        {
-            id: 2,
-            title: "Fé e Devoção",
-            subtitle: "Kits e peças religiosas montadas com carinho",
-            image: "https://images.unsplash.com/photo-1549416802-39bd93282eb1?q=80&w=1950&auto=format&fit=crop",
-            cta: "Confira as ofertas"
+    // Initial Data
+    const [slides, setSlides] = useState<CarouselSlide[]>([]);
+
+    useEffect(() => {
+        fetchSlides();
+    }, []);
+
+    const fetchSlides = async () => {
+        const { data, error } = await supabase
+            .from('carousel_slides')
+            .select('*')
+            .order('id', { ascending: true });
+
+        if (!error && data) {
+            setSlides(data);
         }
-    ]);
-
-    const updateSlide = (id: number, data: Partial<CarouselSlide>) => {
-        setSlides(prev => prev.map(slide => slide.id === id ? { ...slide, ...data } : slide));
     };
 
-    const addSlide = (data: Omit<CarouselSlide, 'id'>) => {
-        const newId = Math.max(...slides.map(s => s.id), 0) + 1;
-        setSlides(prev => [...prev, { id: newId, ...data }]);
+    const updateSlide = async (id: number, data: Partial<CarouselSlide>) => {
+        const { error } = await supabase
+            .from('carousel_slides')
+            .update(data)
+            .eq('id', id);
+
+        if (!error) {
+            fetchSlides();
+        }
     };
 
-    const removeSlide = (id: number) => {
-        setSlides(prev => prev.filter(slide => slide.id !== id));
+    const addSlide = async (data: Omit<CarouselSlide, 'id'>) => {
+        const { error } = await supabase
+            .from('carousel_slides')
+            .insert(data);
+
+        if (!error) {
+            fetchSlides();
+        }
+    };
+
+    const removeSlide = async (id: number) => {
+        const { error } = await supabase
+            .from('carousel_slides')
+            .delete()
+            .eq('id', id);
+
+        if (!error) {
+            fetchSlides();
+        }
     };
 
     return (
