@@ -387,24 +387,42 @@
             font-size: 26px
         }
 
-        /* Wood/MDF Theme & Fix for stuck page */
+        /* Wood/MDF Theme - Gradient Style */
         body {
             overflow: auto !important;
-            background-color: #f0e6dd;
-            background-image: url('assets/wood_texture.jpg');
+            /* Gradient simulating wood essence (Darker to lighter brown) */
+            background: linear-gradient(135deg, #5d4037 0%, #8d6e63 100%);
             background-attachment: fixed;
-            /* Parallax-like effect */
-            background-size: cover;
+            color: #3e2723;
+            /* Dark brown text for contrast */
         }
 
-        /* Ensure content is readable on wood background */
+        /* Update containers to have a lighter wood/parchment look instead of white */
         .card,
         .item,
         .modal-content,
         .js-modal,
-        .newsletter-footer {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            border: 1px solid #d7ccc8;
+        .newsletter-footer,
+        .login-container {
+            background: linear-gradient(to bottom, #efebe9, #d7ccc8) !important;
+            border: 1px solid #a1887f;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* Adjusting text colors inside headers/cards if needed */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .h1,
+        .h2,
+        .h3,
+        .h4,
+        .h5,
+        .h6 {
+            color: #4e342e !important;
         }
     </style>
 
