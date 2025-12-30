@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { Link } from 'react-router-dom';
