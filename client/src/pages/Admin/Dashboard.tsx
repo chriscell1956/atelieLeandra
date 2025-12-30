@@ -204,104 +204,164 @@ export const Dashboard: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-6">
                             {slides.map((slide, index) => (
-                                <div key={slide.id} className="bg-white rounded-lg shadow border border-wood-200 overflow-hidden flex flex-col md:flex-row relative group">
-                                    <button
-                                        onClick={() => {
-                                            if (window.confirm('Excluir este slide?')) {
-                                                removeSlide(slide.id);
-                                            }
-                                        }}
-                                        className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg z-10"
-                                        title="Remover Slide"
-                                    >
-                                        <Power size={16} />
-                                    </button>
-
-                                    <div className="w-full md:w-1/3 h-48 md:h-auto relative bg-gray-100">
-                                        <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
-                                        <div className="absolute top-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs font-bold">Slide {index + 1}</div>
-                                    </div>
-                                    <div className="p-6 flex-1 space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-bold text-wood-700 mb-1">Título Principal</label>
-                                                <input
-                                                    type="text"
-                                                    value={slide.title}
-                                                    onChange={(e) => updateSlide(slide.id, { title: e.target.value })}
-                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900 font-serif"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-bold text-wood-700 mb-1">Texto do Botão</label>
-                                                <input
-                                                    type="text"
-                                                    value={slide.button_text}
-                                                    onChange={(e) => updateSlide(slide.id, { button_text: e.target.value })}
-                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-bold text-wood-700 mb-1">Subtítulo</label>
-                                                <input
-                                                    type="text"
-                                                    value={slide.subtitle}
-                                                    onChange={(e) => updateSlide(slide.id, { subtitle: e.target.value })}
-                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-bold text-wood-700 mb-1">Link (URL)</label>
-                                                <input
-                                                    type="text"
-                                                    value={slide.link || ''}
-                                                    onChange={(e) => updateSlide(slide.id, { link: e.target.value })}
-                                                    placeholder="/produtos"
-                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-bold text-wood-700 mb-1">Imagem do Banner</label>
-                                            <div className="flex items-center space-x-4">
-                                                <div className="w-full h-32 md:w-48 bg-gray-100 rounded border border-gray-300 flex items-center justify-center overflow-hidden relative">
-                                                    {slide.image ? (
-                                                        <img src={slide.image} alt="Preview" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <ImageIcon className="text-gray-400" size={32} />
-                                                    )}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) {
-                                                                const reader = new FileReader();
-                                                                reader.onloadend = () => {
-                                                                    updateSlide(slide.id, { image: reader.result as string });
-                                                                };
-                                                                reader.readAsDataURL(file);
-                                                            }
-                                                        }}
-                                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-wood-100 file:text-wood-700 hover:file:bg-wood-200 cursor-pointer"
-                                                    />
-                                                    <p className="text-xs text-gray-500 mt-2">Recomendado: Imagens horizontais de alta qualidade.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <CarouselSlideItem
+                                    key={slide.id}
+                                    slide={slide}
+                                    index={index}
+                                    onUpdate={updateSlide}
+                                    onRemove={removeSlide}
+                                />
                             ))}
                         </div>
                     </div>
                 )}
             </main>
+        </div>
+    );
+};
+
+// New Component for Slide Item to manage local state
+const CarouselSlideItem: React.FC<{
+    slide: any,
+    index: number,
+    onUpdate: (id: number, data: any) => Promise<void>,
+    onRemove: (id: number) => Promise<void>
+}> = ({ slide, index, onUpdate, onRemove }) => {
+    const [localData, setLocalData] = useState(slide);
+    const [isSaving, setIsSaving] = useState(false);
+    const [hasChanges, setHasChanges] = useState(false);
+
+    useEffect(() => {
+        setLocalData(slide);
+        setHasChanges(false);
+    }, [slide]);
+
+    const handleChange = (field: string, value: string) => {
+        setLocalData(prev => ({ ...prev, [field]: value }));
+        setHasChanges(true);
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        await onUpdate(slide.id, {
+            title: localData.title,
+            subtitle: localData.subtitle,
+            button_text: localData.button_text,
+            link: localData.link,
+            image: localData.image
+        });
+        setIsSaving(false);
+        setHasChanges(false);
+    };
+
+    return (
+        <div className="bg-white rounded-lg shadow border border-wood-200 overflow-hidden flex flex-col md:flex-row relative group">
+            <button
+                onClick={() => {
+                    if (window.confirm('Excluir este slide?')) {
+                        onRemove(slide.id);
+                    }
+                }}
+                className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg z-10"
+                title="Remover Slide"
+            >
+                <Power size={16} />
+            </button>
+
+            <div className="w-full md:w-1/3 h-48 md:h-auto relative bg-gray-100">
+                <img src={localData.image} alt={localData.title} className="w-full h-full object-cover" />
+                <div className="absolute top-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs font-bold">Slide {index + 1}</div>
+            </div>
+            <div className="p-6 flex-1 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-bold text-wood-700 mb-1">Título Principal</label>
+                        <input
+                            type="text"
+                            value={localData.title}
+                            onChange={(e) => handleChange('title', e.target.value)}
+                            className="w-full border border-wood-300 rounded p-2 text-wood-900 font-serif"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-wood-700 mb-1">Texto do Botão</label>
+                        <input
+                            type="text"
+                            value={localData.button_text}
+                            onChange={(e) => handleChange('button_text', e.target.value)}
+                            className="w-full border border-wood-300 rounded p-2 text-wood-900"
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-bold text-wood-700 mb-1">Subtítulo</label>
+                        <input
+                            type="text"
+                            value={localData.subtitle}
+                            onChange={(e) => handleChange('subtitle', e.target.value)}
+                            className="w-full border border-wood-300 rounded p-2 text-wood-900"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-wood-700 mb-1">Link (URL)</label>
+                        <input
+                            type="text"
+                            value={localData.link || ''}
+                            onChange={(e) => handleChange('link', e.target.value)}
+                            placeholder="/produtos"
+                            className="w-full border border-wood-300 rounded p-2 text-wood-900"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold text-wood-700 mb-1">Imagem do Banner</label>
+                    <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <div className="w-full h-32 md:w-48 bg-gray-100 rounded border border-gray-300 flex items-center justify-center overflow-hidden relative">
+                            {localData.image ? (
+                                <img src={localData.image} alt="Preview" className="w-full h-full object-cover" />
+                            ) : (
+                                <ImageIcon className="text-gray-400" size={32} />
+                            )}
+                        </div>
+                        <div className="flex-1 w-full">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            handleChange('image', reader.result as string);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-wood-100 file:text-wood-700 hover:file:bg-wood-200 cursor-pointer"
+                            />
+                            <p className="text-xs text-gray-500 mt-2">Recomendado: Imagens horizontais de alta qualidade.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="pt-4 flex justify-end">
+                    <button
+                        onClick={handleSave}
+                        disabled={!hasChanges || isSaving}
+                        className={`
+                            px-6 py-2 rounded-lg font-bold transition flex items-center space-x-2
+                            ${hasChanges
+                                ? 'bg-gold-500 text-wood-900 shadow-md hover:bg-gold-600'
+                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
+                        `}
+                    >
+                        {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
