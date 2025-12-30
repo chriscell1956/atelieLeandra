@@ -64,7 +64,7 @@ export const ProductManager: React.FC = () => {
             // Use image from state (updated in handleImageChange) or existing product image
             const imageUrl = productData.image_url || editingProduct?.image_url || 'https://via.placeholder.com/150';
 
-            const productToSave = {
+            const productToSave: any = {
                 id: editingProduct?.id || crypto.randomUUID(),
                 name,
                 price,
@@ -75,9 +75,8 @@ export const ProductManager: React.FC = () => {
                 details: {
                     dimensions,
                     productionTime
-                },
-                updated_at: new Date().toISOString()
-            } as any;
+                }
+            };
 
             // Only add created_at if it's a new product
             if (!editingProduct?.id) {
