@@ -77,12 +77,38 @@ export const Navbar: React.FC = () => {
             </div>
 
             {isOpen && (
-                <div className="md:hidden">
+                <div className="md:hidden border-t border-wood-700">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        <Link to="/" className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Início</Link>
-                        <Link to="/produtos" className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Produtos</Link>
-                        <Link to="/sobre" className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Sobre</Link>
-                        <Link to="/contato" className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Contato</Link>
+                        <Link to="/" onClick={() => setIsOpen(false)} className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Início</Link>
+                        <Link to="/produtos" onClick={() => setIsOpen(false)} className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Produtos</Link>
+                        <Link to="/sobre" onClick={() => setIsOpen(false)} className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Sobre</Link>
+                        <Link to="/contato" onClick={() => setIsOpen(false)} className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium">Contato</Link>
+
+                        <div className="border-t border-wood-700 my-2 pt-2">
+                            {user ? (
+                                <>
+                                    <div className="px-3 py-2 text-gold-200 font-medium">Olá, {user.name}</div>
+                                    {user.role === 'admin' && (
+                                        <Link to="/admin" onClick={() => setIsOpen(false)} className="bg-gold-500/20 text-gold-400 block px-3 py-2 rounded-md text-base font-medium mb-2 border border-gold-500/30">Área Admin</Link>
+                                    )}
+                                    <button
+                                        onClick={() => { logout(); setIsOpen(false); }}
+                                        className="w-full text-left text-red-400 hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium"
+                                    >
+                                        Sair da Conta
+                                    </button>
+                                </>
+                            ) : (
+                                <Link to="/login" onClick={() => setIsOpen(false)} className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2">
+                                    <User size={20} />
+                                    <span>Entrar (Admin)</span>
+                                </Link>
+                            )}
+                            <Link to="/carrinho" onClick={() => setIsOpen(false)} className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2">
+                                <ShoppingCart size={20} />
+                                <span>Meu Carrinho ({itemCount})</span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}

@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { Link } from 'react-router-dom';
 
 export const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
-    const { slides, updateSlide } = useSiteContent();
+    const { slides, updateSlide, addSlide, removeSlide } = useSiteContent();
     const [activeTab, setActiveTab] = useState('overview');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="flex h-[calc(100vh-64px)] relative">
-            {/* Mobile Sidebar Toggle */}
+        <div className="flex h-[calc(100vh-80px)] relative">
+            {/* Mobile Sidebar Toggle - Adjusted to be visible below fixed navbar if needed */}
             <button
-                className="md:hidden absolute top-4 left-4 z-20 bg-wood-800 text-white p-2 rounded shadow-lg"
+                className="md:hidden fixed top-24 left-4 z-30 bg-gold-500 text-wood-900 p-3 rounded-full shadow-2xl border-2 border-wood-800"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
                 {isSidebarOpen ? <ArrowLeft size={24} /> : <LayoutDashboard size={24} />}
@@ -23,13 +23,14 @@ export const Dashboard: React.FC = () => {
             {/* Sidebar */}
             <aside className={`
                 w-64 bg-wood-800 text-wood-100 flex-col
-                fixed md:relative z-10 h-full transition-transform duration-300 ease-in-out
+                fixed md:relative z-40 h-full transition-transform duration-300 ease-in-out
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+                shadow-2xl md:shadow-none
             `}>
                 <div className="p-6 border-b border-wood-700 flex justify-between items-center">
                     <h2 className="text-xl font-bold text-gold-500">Administração</h2>
                     <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-gray-400 hover:text-white">
-                        <ArrowLeft size={20} />
+                        <X size={24} />
                     </button>
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
@@ -184,13 +185,37 @@ export const Dashboard: React.FC = () => {
 
                 {activeTab === 'carousel' && (
                     <div className="space-y-6">
-                        <div className="bg-yellow-50 border-l-4 border-gold-500 p-4 rounded shadow-sm">
-                            <p className="text-wood-800 font-medium">Aqui você pode editar as imagens e textos que aparecem no topo do site.</p>
+                        <div className="flex justify-between items-center bg-yellow-50 border-l-4 border-gold-500 p-4 rounded shadow-sm">
+                            <p className="text-wood-800 font-medium">Aqui você pode gerenciar as imagens e textos que aparecem no topo do site.</p>
+                            <button
+                                onClick={() => addSlide({
+                                    title: 'Novo Título',
+                                    subtitle: 'Subtítulo aqui',
+                                    image: 'https://via.placeholder.com/1200x400',
+                                    cta: 'Ver Mais'
+                                })}
+                                className="bg-wood-800 text-gold-400 px-4 py-2 rounded font-bold hover:bg-wood-900 transition flex items-center space-x-2"
+                            >
+                                <ImageIcon size={20} />
+                                <span>Adicionar Slide</span>
+                            </button>
                         </div>
 
                         <div className="grid grid-cols-1 gap-6">
                             {slides.map((slide, index) => (
-                                <div key={slide.id} className="bg-white rounded-lg shadow border border-wood-200 overflow-hidden flex flex-col md:flex-row">
+                                <div key={slide.id} className="bg-white rounded-lg shadow border border-wood-200 overflow-hidden flex flex-col md:flex-row relative group">
+                                    <button
+                                        onClick={() => {
+                                            if (window.confirm('Excluir este slide?')) {
+                                                removeSlide(slide.id);
+                                            }
+                                        }}
+                                        className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg z-10"
+                                        title="Remover Slide"
+                                    >
+                                        <Power size={16} />
+                                    </button>
+
                                     <div className="w-full md:w-1/3 h-48 md:h-auto relative bg-gray-100">
                                         <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
                                         <div className="absolute top-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs font-bold">Slide {index + 1}</div>
