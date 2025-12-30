@@ -47,43 +47,64 @@ export const ProductManager: React.FC = () => {
     };
 
     const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
+        try {
+            e.preventDefault();
+            const form = e.target as HTMLFormElement;
 
-        const form = e.target as HTMLFormElement;
-        const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-        const price = parseFloat((form.elements.namedItem('price') as HTMLInputElement).value);
-        const category = (form.elements.namedItem('category') as HTMLSelectElement).value;
-        const imageUrl = (form.elements.namedItem('image') as HTMLInputElement).value || productData.image_url;
-        const description = (form.elements.namedItem('description') as HTMLTextAreaElement).value;
-        const dimensions = (form.elements.namedItem('dimensions') as HTMLInputElement).value;
-        const productionTime = (form.elements.namedItem('productionTime') as HTMLInputElement).value;
-        const isHighlight = (form.elements.namedItem('is_highlight') as HTMLInputElement).checked;
+            // Get form values safely
+            const name = (form.elements.namedItem('name') as HTMLInputElement)?.value || '';
+            const priceValue = (form.elements.namedItem('price') as HTMLInputElement)?.value;
+            const price = priceValue ? parseFloat(priceValue.replace(',', '.')) : 0;
+            const category = (form.elements.namedItem('category') as HTMLSelectElement)?.value || 'Geral';
+            const description = (form.elements.namedItem('description') as HTMLTextAreaElement)?.value || '';
+            const dimensions = (form.elements.namedItem('dimensions') as HTMLInputElement)?.value || '';
+            const productionTime = (form.elements.namedItem('productionTime') as HTMLInputElement)?.value || '';
+            const isHighlight = (form.elements.namedItem('is_highlight') as HTMLInputElement)?.checked || false;
 
-        const productToSave = {
-            id: editingProduct?.id || crypto.randomUUID(), // Ensure ID generation
-            name,
-            price,
-            image_url: imageUrl || 'https://via.placeholder.com/150',
-            category,
-            is_highlight: isHighlight,
-            description,
-            details: {
-                dimensions: dimensions || '',
-                productionTime: productionTime || ''
+            // Use image from state (updated in handleImageChange) or existing product image
+            const imageUrl = productData.image_url || editingProduct?.image_url || 'https://via.placeholder.com/150';
+
+            const productToSave = {
+                id: editingProduct?.id || crypto.randomUUID(),
+                name,
+                price,
+                image_url: imageUrl,
+                category,
+                is_highlight: isHighlight,
+                description,
+                details: {
+                    dimensions,
+                    productionTime
+                },
+                updated_at: new Date().toISOString()
+            } as any;
+
+            // Only add created_at if it's a new product
+            if (!editingProduct?.id) {
+                productToSave.created_at = new Date().toISOString();
             }
-        };
 
-        const { error } = await supabase
-            .from('products')
-            .upsert(productToSave);
+            console.log('Tentando salvar produto:', productToSave);
 
-        if (error) {
-            alert('Erro ao salvar produto: ' + error.message);
-        } else {
-            fetchProducts(); // Refresh list
-            setShowModal(false);
-            setEditingProduct(null);
-            setProductData({});
+            const { data, error } = await supabase
+                .from('products')
+                .upsert(productToSave)
+                .select();
+
+            if (error) {
+                console.error('Supabase error saving product:', error);
+                alert('Erro ao salvar no banco: ' + error.message);
+            } else {
+                console.log('Produto salvo com sucesso:', data);
+                await fetchProducts(); // Refresh list
+                setShowModal(false);
+                setEditingProduct(null);
+                setProductData({});
+                alert('Produto salvo com sucesso!');
+            }
+        } catch (err) {
+            console.error('Unexpected error in handleSave:', err);
+            alert('Erro inesperado: ' + (err instanceof Error ? err.message : String(err)));
         }
     };
 
@@ -154,11 +175,18 @@ export const ProductManager: React.FC = () => {
                                                 ? product.image_url
                                                 : product.image_url.startsWith('http')
                                                     ? product.image_url
-                                                    : `http://localhost:3000/${product.image_url}`
+                                                    : product.image_url.startsWith('/')
+                                                        ? product.image_url
+                                                        : `/${product.image_url}`
                                         }
                                         alt={product.name}
                                         className="w-12 h-12 rounded object-cover border border-wood-200"
-                                        onError={(e) => (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48'}
+                                        onError={(e) => {
+                                            const img = e.target as HTMLImageElement;
+                                            if (!img.src.includes('placeholder')) {
+                                                img.src = 'https://via.placeholder.com/48';
+                                            }
+                                        }}
                                     />
                                 </td>
                                 <td className="p-4 font-medium">{product.name}</td>
@@ -247,7 +275,9 @@ export const ProductManager: React.FC = () => {
                                                                 ? productData.image_url
                                                                 : productData.image_url.startsWith('http')
                                                                     ? productData.image_url
-                                                                    : `http://localhost:3000/${productData.image_url}`
+                                                                    : productData.image_url.startsWith('/')
+                                                                        ? productData.image_url
+                                                                        : `/${productData.image_url}`
                                                         }
                                                         alt="Preview"
                                                         className="w-full h-full object-cover"

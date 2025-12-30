@@ -26,7 +26,7 @@ export const HeroCarousel: React.FC = () => {
             {slides.map((slide, index) => (
                 <div
                     key={slide.id}
-                    className={`absolute inset - 0 transition - opacity duration - 1000 ease -in -out ${index === currentSlide ? 'opacity-100' : 'opacity-0'} `}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
                 >
                     <div className="absolute inset-0 bg-black/40 z-10" />
                     <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />

@@ -12,10 +12,10 @@ export const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const success = await login(email, password);
-        if (success) {
+        if (success === true) {
             navigate('/admin');
         } else {
-            setError('Credenciais inválidas');
+            setError(typeof success === 'string' ? success : 'Credenciais inválidas');
         }
     };
 

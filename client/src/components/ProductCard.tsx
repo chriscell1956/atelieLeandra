@@ -31,11 +31,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                     </div>
                 )}
                 <img
-                    src={product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url}
+                    src={
+                        product.image_url.startsWith('data:')
+                            ? product.image_url
+                            : product.image_url.startsWith('http')
+                                ? product.image_url
+                                : product.image_url.startsWith('/')
+                                    ? product.image_url
+                                    : `/${product.image_url}`
+                    }
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
                     onClick={() => onViewDetails(product)}
-                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x300?text=Sem+Imagem' }}
+                    onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        if (!img.src.includes('placeholder')) {
+                            img.src = 'https://via.placeholder.com/300x300?text=Sem+Imagem';
+                        }
+                    }}
                 />
 
                 {/* Overlay Buttons */}

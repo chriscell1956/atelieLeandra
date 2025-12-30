@@ -11,7 +11,7 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
-    login: (email: string, password: string) => Promise<boolean>;
+    login: (email: string, password: string) => Promise<boolean | string>;
     logout: () => void;
     isLoading: boolean;
 }
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         setIsLoading(false);
-        return !error && !!data.user;
+        return error ? error.message : !!data.user;
     };
 
     const logout = async () => {

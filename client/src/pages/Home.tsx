@@ -4,21 +4,31 @@ import { ProductCard } from '../components/ProductCard';
 import { CashbackSystem } from '../components/CashbackSystem';
 import { ProductDetailsModal } from '../components/ProductDetailsModal';
 import { useCart } from '../context/CartContext';
+import { supabase } from '../lib/supabase';
 
 export const Home: React.FC = () => {
     const [products, setProducts] = useState<any[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const { addToCart } = useCart();
 
     useEffect(() => {
-        // Mock data fetch for Home
-        setProducts([
-            { id: 'MFM10531', name: 'Kit Medalhão NS Guadalupe', price: 52.20, category: 'Geral', is_highlight: true, is_promotion: false, image_url: 'stores/001/977/761/products/2-766ec987f46ddeb0e317655416629878-480-0.webp', details: { dimensions: '25cm x 25cm', productionTime: '3 dias úteis' } },
-            { id: 'MFM10529', name: 'Combo Projeto 110 Clube', price: 58.90, category: 'Geral', is_highlight: false, is_promotion: true, image_url: 'stores/001/977/761/products/2-7085b9e70857452a5317655381200361-480-0.webp', details: { dimensions: '30cm x 20cm', productionTime: '5 dias úteis' } },
-            { id: 'MFM10528', name: 'Quadro Sagrado Coração', price: 36.90, category: 'Geral', is_highlight: true, is_promotion: false, image_url: 'stores/001/977/761/products/1-399c93aa1ff16c5a5d17655382547707-480-0.webp', details: { dimensions: '20cm x 20cm', productionTime: '2 dias úteis' } },
-            { id: 'MFM10527', name: 'Pêndulo Mãezinha Luxo', price: 48.20, category: 'Geral', is_highlight: false, is_promotion: false, image_url: 'stores/001/977/761/products/2-f9b75c320d0909adb717655389700203-480-0.webp' }
-        ]);
+        fetchProducts();
     }, []);
+
+    const fetchProducts = async () => {
+        setIsLoading(true);
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_highlight', true)
+            .order('created_at', { ascending: false });
+
+        if (!error && data) {
+            setProducts(data);
+        }
+        setIsLoading(false);
+    };
 
     const handleAddToCart = (product: any) => {
         addToCart(product);
@@ -37,14 +47,24 @@ export const Home: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {products.map(product => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onViewDetails={setSelectedProduct}
-                            onAddToCart={handleAddToCart}
-                        />
-                    ))}
+                    {isLoading ? (
+                        Array(4).fill(0).map((_, i) => (
+                            <div key={i} className="bg-wood-100 animate-pulse h-64 rounded-lg"></div>
+                        ))
+                    ) : products.length > 0 ? (
+                        products.map(product => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onViewDetails={setSelectedProduct}
+                                onAddToCart={handleAddToCart}
+                            />
+                        ))
+                    ) : (
+                        <div className="col-span-full text-center py-12 text-wood-600">
+                            Nenhum produto em destaque no momento.
+                        </div>
+                    )}
                 </div>
             </div>
 
