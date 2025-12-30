@@ -7,21 +7,20 @@ export interface CarouselSlide {
     title: string;
     subtitle: string;
     image: string;
-    cta: string;
+    button_text: string;
+    link?: string;
 }
 
 interface SiteContentContextType {
     slides: CarouselSlide[];
-    updateSlide: (id: number, data: Partial<CarouselSlide>) => void;
-    addSlide: (data: Omit<CarouselSlide, 'id'>) => void;
-    removeSlide: (id: number) => void;
+    updateSlide: (id: number, data: Partial<CarouselSlide>) => Promise<void>;
+    addSlide: (data: Omit<CarouselSlide, 'id'>) => Promise<void>;
+    removeSlide: (id: number) => Promise<void>;
 }
 
 const SiteContentContext = createContext<SiteContentContextType | undefined>(undefined);
 
 export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // Initial Mock Data
-    // Initial Data
     const [slides, setSlides] = useState<CarouselSlide[]>([]);
 
     useEffect(() => {
@@ -29,45 +28,76 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }, []);
 
     const fetchSlides = async () => {
-        const { data, error } = await supabase
-            .from('carousel_slides')
-            .select('*')
-            .order('id', { ascending: true });
+        try {
+            const { data, error } = await supabase
+                .from('carousel_slides')
+                .select('*')
+                .order('id', { ascending: true });
 
-        if (!error && data) {
-            setSlides(data);
+            if (error) {
+                console.error('Error fetching slides:', error);
+            } else if (data) {
+                setSlides(data);
+            }
+        } catch (err) {
+            console.error('Unexpected error fetching slides:', err);
         }
     };
 
     const updateSlide = async (id: number, data: Partial<CarouselSlide>) => {
-        const { error } = await supabase
-            .from('carousel_slides')
-            .update(data)
-            .eq('id', id);
+        try {
+            const { error } = await supabase
+                .from('carousel_slides')
+                .update(data)
+                .eq('id', id);
 
-        if (!error) {
-            fetchSlides();
+            if (error) {
+                alert('Erro ao atualizar slide: ' + error.message);
+                console.error('Supabase error updating slide:', error);
+            } else {
+                await fetchSlides();
+            }
+        } catch (err) {
+            alert('Erro inesperado ao atualizar slide');
+            console.error(err);
         }
     };
 
     const addSlide = async (data: Omit<CarouselSlide, 'id'>) => {
-        const { error } = await supabase
-            .from('carousel_slides')
-            .insert(data);
+        try {
+            console.log('Tentando adicionar slide:', data);
+            const { error } = await supabase
+                .from('carousel_slides')
+                .insert([data]);
 
-        if (!error) {
-            fetchSlides();
+            if (error) {
+                alert('Erro ao adicionar slide: ' + error.message);
+                console.error('Supabase error adding slide:', error);
+            } else {
+                await fetchSlides();
+            }
+        } catch (err) {
+            alert('Erro inesperado ao adicionar slide');
+            console.error(err);
         }
     };
 
     const removeSlide = async (id: number) => {
-        const { error } = await supabase
-            .from('carousel_slides')
-            .delete()
-            .eq('id', id);
+        try {
+            const { error } = await supabase
+                .from('carousel_slides')
+                .delete()
+                .eq('id', id);
 
-        if (!error) {
-            fetchSlides();
+            if (error) {
+                alert('Erro ao remover slide: ' + error.message);
+                console.error('Supabase error removing slide:', error);
+            } else {
+                await fetchSlides();
+            }
+        } catch (err) {
+            alert('Erro inesperado ao remover slide');
+            console.error(err);
         }
     };
 

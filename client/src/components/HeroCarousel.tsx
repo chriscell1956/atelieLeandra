@@ -33,9 +33,15 @@ export const HeroCarousel: React.FC = () => {
                     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white p-4">
                         <h2 className="text-5xl font-bold mb-4 drop-shadow-lg">{slide.title}</h2>
                         <p className="text-xl mb-8 drop-shadow-md">{slide.subtitle}</p>
-                        <button className="bg-wood-600 hover:bg-wood-700 text-white px-8 py-3 rounded-full font-bold text-lg transition transform hover:scale-105 shadow-lg border-2 border-wood-400">
-                            {slide.cta}
-                        </button>
+                        {slide.link ? (
+                            <a href={slide.link} className="bg-wood-600 hover:bg-wood-700 text-white px-8 py-3 rounded-full font-bold text-lg transition transform hover:scale-105 shadow-lg border-2 border-wood-400">
+                                {slide.button_text}
+                            </a>
+                        ) : (
+                            <button className="bg-wood-600 hover:bg-wood-700 text-white px-8 py-3 rounded-full font-bold text-lg transition transform hover:scale-105 shadow-lg border-2 border-wood-400">
+                                {slide.button_text}
+                            </button>
+                        )}
                     </div>
                 </div>
             ))}

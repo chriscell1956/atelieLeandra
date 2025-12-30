@@ -192,7 +192,8 @@ export const Dashboard: React.FC = () => {
                                     title: 'Novo Título',
                                     subtitle: 'Subtítulo aqui',
                                     image: 'https://via.placeholder.com/1200x400',
-                                    cta: 'Ver Mais'
+                                    button_text: 'Ver Mais',
+                                    link: '/produtos'
                                 })}
                                 className="bg-wood-800 text-gold-400 px-6 py-3 rounded-lg font-bold hover:bg-wood-900 transition flex items-center justify-center space-x-2 w-full sm:w-auto shadow-md"
                             >
@@ -235,21 +236,33 @@ export const Dashboard: React.FC = () => {
                                                 <label className="block text-sm font-bold text-wood-700 mb-1">Texto do Botão</label>
                                                 <input
                                                     type="text"
-                                                    value={slide.cta}
-                                                    onChange={(e) => updateSlide(slide.id, { cta: e.target.value })}
+                                                    value={slide.button_text}
+                                                    onChange={(e) => updateSlide(slide.id, { button_text: e.target.value })}
                                                     className="w-full border border-wood-300 rounded p-2 text-wood-900"
                                                 />
                                             </div>
                                         </div>
 
-                                        <div>
-                                            <label className="block text-sm font-bold text-wood-700 mb-1">Subtítulo</label>
-                                            <input
-                                                type="text"
-                                                value={slide.subtitle}
-                                                onChange={(e) => updateSlide(slide.id, { subtitle: e.target.value })}
-                                                className="w-full border border-wood-300 rounded p-2 text-wood-900"
-                                            />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-bold text-wood-700 mb-1">Subtítulo</label>
+                                                <input
+                                                    type="text"
+                                                    value={slide.subtitle}
+                                                    onChange={(e) => updateSlide(slide.id, { subtitle: e.target.value })}
+                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-bold text-wood-700 mb-1">Link (URL)</label>
+                                                <input
+                                                    type="text"
+                                                    value={slide.link || ''}
+                                                    onChange={(e) => updateSlide(slide.id, { link: e.target.value })}
+                                                    placeholder="/produtos"
+                                                    className="w-full border border-wood-300 rounded p-2 text-wood-900"
+                                                />
+                                            </div>
                                         </div>
 
                                         <div>
