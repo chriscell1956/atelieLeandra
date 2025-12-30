@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteContent } from '../../context/SiteContentContext';
@@ -237,7 +237,7 @@ const CarouselSlideItem: React.FC<{
     }, [slide]);
 
     const handleChange = (field: string, value: string) => {
-        setLocalData(prev => ({ ...prev, [field]: value }));
+        setLocalData((prev: any) => ({ ...prev, [field]: value }));
         setHasChanges(true);
     };
 
