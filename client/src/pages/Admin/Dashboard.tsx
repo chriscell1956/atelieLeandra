@@ -185,7 +185,7 @@ export const Dashboard: React.FC = () => {
 
                 {activeTab === 'carousel' && (
                     <div className="space-y-6">
-                        <div className="flex justify-between items-center bg-yellow-50 border-l-4 border-gold-500 p-4 rounded shadow-sm">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-yellow-50 border-l-4 border-gold-500 p-4 rounded shadow-sm gap-4">
                             <p className="text-wood-800 font-medium">Aqui você pode gerenciar as imagens e textos que aparecem no topo do site.</p>
                             <button
                                 onClick={() => addSlide({
@@ -194,9 +194,9 @@ export const Dashboard: React.FC = () => {
                                     image: 'https://via.placeholder.com/1200x400',
                                     cta: 'Ver Mais'
                                 })}
-                                className="bg-wood-800 text-gold-400 px-4 py-2 rounded font-bold hover:bg-wood-900 transition flex items-center space-x-2"
+                                className="bg-wood-800 text-gold-400 px-6 py-3 rounded-lg font-bold hover:bg-wood-900 transition flex items-center justify-center space-x-2 w-full sm:w-auto shadow-md"
                             >
-                                <ImageIcon size={20} />
+                                <Plus size={24} />
                                 <span>Adicionar Slide</span>
                             </button>
                         </div>

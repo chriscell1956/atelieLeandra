@@ -141,13 +141,13 @@ export const ProductManager: React.FC = () => {
 
     return (
         <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <h1 className="text-2xl font-bold text-wood-800">Gerenciar Produtos</h1>
                 <button
                     onClick={() => { setEditingProduct(null); setProductData({}); setShowModal(true); }}
-                    className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                    className="flex items-center justify-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full sm:w-auto shadow-lg font-bold"
                 >
-                    <Plus size={20} />
+                    <Plus size={24} />
                     <span>Novo Produto</span>
                 </button>
             </div>
@@ -214,11 +214,11 @@ export const ProductManager: React.FC = () => {
 
             {/* Modal de Edição/Criação */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl animate-fade-in relative my-8">
-                        <div className="bg-wood-700 text-white p-4 flex justify-between items-center rounded-t-lg">
+                <div className="fixed inset-0 bg-black/60 flex items-start sm:items-center justify-center z-[60] overflow-y-auto p-0 sm:p-4">
+                    <div className="bg-white rounded-none sm:rounded-lg shadow-2xl w-full max-w-2xl animate-fade-in relative min-h-screen sm:min-h-0">
+                        <div className="bg-wood-700 text-white p-4 flex justify-between items-center sticky top-0 z-10 sm:rounded-t-lg">
                             <h2 className="text-xl font-bold">{editingProduct ? 'Editar Produto' : 'Novo Produto'}</h2>
-                            <button onClick={() => setShowModal(false)} className="hover:bg-wood-600 p-1 rounded"><X size={24} /></button>
+                            <button onClick={() => setShowModal(false)} className="hover:bg-wood-600 p-2 rounded-full transition-colors"><X size={28} /></button>
                         </div>
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
