@@ -4,7 +4,7 @@ import { MessageCircle } from 'lucide-react';
 export const WhatsAppButton: React.FC = () => {
     // Substitua pelo número real da Leandra
     // O formato deve ser apenas números: 55 + DDD + Número
-    const phoneNumber = "5511000000000";
+    const phoneNumber = "5518997075761";
     const message = encodeURIComponent("Olá Leandra, vim pelo site e gostaria de saber mais sobre seus produtos!");
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
 
