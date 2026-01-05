@@ -70,7 +70,7 @@ export const Home: React.FC = () => {
 
             <div className="bg-wood-200 rounded-xl p-8 mb-12 text-center">
                 <h3 className="text-2xl font-bold text-wood-800 mb-4">Feito à Mão com Carinho</h3>
-                <p className="text-wood-700 max-w-2xl mx-auto mb-6">Cada peça é produzida individualmente, garantindo exclusividade e qualidade para sua decoração ou devoção.</p>
+                <p className="text-wood-700 max-w-2xl mx-auto mb-6">Cada peça é feita com dedicação e carinho.</p>
                 <button className="bg-wood-800 text-gold-400 px-6 py-2 rounded font-bold hover:bg-wood-900 transition">Conheça o Ateliê</button>
             </div>
 

@@ -8,7 +8,7 @@ export const About: React.FC = () => {
             <div className="prose prose-lg text-wood-700 max-w-none space-y-6">
                 <p>
                     O <strong>Ateliê Leandra</strong> nasceu da paixão pelo artesanato e da devoção que transforma materiais simples em peças de arte sacra e decoração exclusivas.
-                    Localizado no coração de cada peça está o cuidado, a oração e a atenção aos detalhes.
+                    Localizado no coração de cada peça está o cuidado, a dedicação e a atenção aos detalhes.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-12">

@@ -74,7 +74,7 @@ export const Contact: React.FC = () => {
                     </ul>
 
                     <div className="mt-10 p-4 bg-white rounded-lg border border-wood-300 shadow-sm text-center">
-                        <p className="text-sm text-wood-600 italic">"Cada peça é feita com oração e carinho."</p>
+                        <p className="text-sm text-wood-600 italic">"Cada peça é feita com dedicação e carinho."</p>
                     </div>
                 </div>
             </div>

@@ -5,6 +5,21 @@ import { Trash2, Smartphone } from 'lucide-react';
 export const CartPage: React.FC = () => {
     const { items, removeFromCart, total, clearCart } = useCart();
     const [isCheckout, setIsCheckout] = useState(false);
+    const [cep, setCep] = useState('');
+    const [shippingQuote, setShippingQuote] = useState<{ price: number; days: number } | null>(null);
+
+    const handleCalculateShipping = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (cep.length >= 8) {
+            // Simulação de frete
+            setShippingQuote({
+                price: 25.00,
+                days: 5
+            });
+        }
+    };
+
+    const finalTotal = total + (shippingQuote?.price || 0);
 
     if (items.length === 0 && !isCheckout) {
         return (
@@ -50,6 +65,8 @@ export const CartPage: React.FC = () => {
         );
     }
 
+
+
     return (
         <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold text-wood-900 mb-8 border-b border-wood-200 pb-4">Seu Carrinho</h1>
@@ -74,13 +91,46 @@ export const CartPage: React.FC = () => {
                         </div>
                     ))}
                 </div>
-                <div className="bg-wood-50 p-6 flex justify-between items-center border-t border-wood-200">
+
+                {/* Shipping Calculator */}
+                <div className="bg-wood-50 p-6 border-t border-wood-200">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <form onSubmit={handleCalculateShipping} className="flex items-end gap-2 text-sm">
+                            <div>
+                                <label className="block text-wood-600 mb-1 font-semibold">Calcule o Frete</label>
+                                <input
+                                    type="text"
+                                    value={cep}
+                                    onChange={(e) => setCep(e.target.value.replace(/\D/g, ''))}
+                                    placeholder="00000-000"
+                                    maxLength={8}
+                                    className="border border-wood-300 rounded p-2 w-32 focus:outline-none focus:border-gold-500"
+                                />
+                            </div>
+                            <button type="submit" className="bg-wood-600 text-white px-4 py-2 rounded font-bold hover:bg-wood-700 transition">
+                                OK
+                            </button>
+                        </form>
+
+                        {shippingQuote && (
+                            <div className="text-right">
+                                <p className="text-wood-800 font-bold">Frete Fixo: R$ {shippingQuote.price.toFixed(2)}</p>
+                                <p className="text-xs text-wood-500">Entrega em até {shippingQuote.days} dias úteis</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="bg-wood-100 p-6 flex justify-between items-center border-t border-wood-200">
                     <span className="text-xl font-bold text-wood-800">Total</span>
-                    <span className="text-2xl font-bold text-wood-900">R$ {total.toFixed(2)}</span>
+                    <span className="text-2xl font-bold text-wood-900">R$ {finalTotal.toFixed(2)}</span>
                 </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex flex-col items-end space-y-4">
+                <p className="text-sm text-wood-500">
+                    Prazo de devolução: <strong>7 dias</strong> após o recebimento.
+                </p>
                 <button onClick={() => setIsCheckout(true)} className="bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition shadow-lg flex items-center space-x-2">
                     <span>Finalizar Compra</span>
                 </button>
