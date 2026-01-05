@@ -100,3 +100,9 @@ alter table public.users enable row level security;
 create policy "Qualquer um pode ver perfis" on public.users for select using (true);
 create policy "Apenas o próprio usuário pode editar" on public.users for update using (auth.uid() = id);
 ```
+
+## Atualização: Controle de Estoque
+Para ativar o controle de estoque, execute este comando no SQL Editor:
+```sql
+alter table public.products add column stock integer default 0;
+```

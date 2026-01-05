@@ -15,6 +15,8 @@ import { CartProvider } from './context/CartContext';
 import { SiteContentProvider } from './context/SiteContentContext';
 import { WhatsAppButton } from './components/WhatsAppButton';
 
+import { ProductsPage } from './pages/ProductsPage';
+
 function App() {
   return (
     <AuthProvider>
@@ -28,7 +30,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/carrinho" element={<CartPage />} />
-                  <Route path="/produtos" element={<div className="p-4 text-center py-12">Produtos (Em breve)</div>} />
+                  <Route path="/produtos" element={<ProductsPage />} />
                   <Route path="/contato" element={<Contact />} />
                   <Route path="/sobre" element={<About />} />
 

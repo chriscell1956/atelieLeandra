@@ -31,8 +31,11 @@ export const Home: React.FC = () => {
     };
 
     const handleAddToCart = (product: any) => {
+        if (product.stock !== undefined && product.stock <= 0) {
+            alert('Produto esgotado!');
+            return;
+        }
         addToCart(product);
-        // Maybe show toast notification
         alert(`Adicionado: ${product.name}`);
     };
 

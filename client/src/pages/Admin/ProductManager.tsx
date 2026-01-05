@@ -11,6 +11,7 @@ interface Product {
     is_highlight: boolean;
     image_url: string;
     description?: string;
+    stock?: number;
     details?: {
         dimensions?: string;
         productionTime?: string;
@@ -59,6 +60,8 @@ export const ProductManager: React.FC = () => {
             const description = (form.elements.namedItem('description') as HTMLTextAreaElement)?.value || '';
             const dimensions = (form.elements.namedItem('dimensions') as HTMLInputElement)?.value || '';
             const productionTime = (form.elements.namedItem('productionTime') as HTMLInputElement)?.value || '';
+            const stockValue = (form.elements.namedItem('stock') as HTMLInputElement)?.value;
+            const stock = stockValue ? parseInt(stockValue) : 0;
             const isHighlight = (form.elements.namedItem('is_highlight') as HTMLInputElement)?.checked || false;
 
             // Use image from state (updated in handleImageChange) or existing product image
@@ -72,6 +75,7 @@ export const ProductManager: React.FC = () => {
                 category,
                 is_highlight: isHighlight,
                 description,
+                stock, // Add stock to payload
                 details: {
                     dimensions,
                     productionTime
@@ -159,7 +163,7 @@ export const ProductManager: React.FC = () => {
                             <th className="p-4 font-bold text-wood-700">Imagem</th>
                             <th className="p-4 font-bold text-wood-700">Nome</th>
                             <th className="p-4 font-bold text-wood-700">Preço</th>
-                            <th className="p-4 font-bold text-wood-700">Detalhes</th>
+                            <th className="p-4 font-bold text-wood-700">Estoque</th>
                             <th className="p-4 font-bold text-wood-700">Destaque</th>
                             <th className="p-4 font-bold text-wood-700">Ações</th>
                         </tr>
@@ -190,9 +194,7 @@ export const ProductManager: React.FC = () => {
                                 </td>
                                 <td className="p-4 font-medium">{product.name}</td>
                                 <td className="p-4">R$ {product.price.toFixed(2)}</td>
-                                <td className="p-4 text-sm text-gray-500 max-w-xs truncate">
-                                    {product.details?.dimensions || '-'}
-                                </td>
+                                <td className="p-4 font-semibold text-wood-800">{product.stock || 0} unid.</td>
                                 <td className="p-4">
                                     {product.is_highlight ?
                                         <span className="bg-gold-400/20 text-wood-800 px-2 py-1 rounded text-xs font-bold border border-gold-400">SIM</span>
@@ -250,6 +252,11 @@ export const ProductManager: React.FC = () => {
                                         <option value="Casamento">Casamento</option>
                                         <option value="Presentes">Presentes</option>
                                     </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-wood-800 mb-1">Quantidade em Estoque</label>
+                                    <input type="number" name="stock" defaultValue={editingProduct?.stock || 0} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" />
                                 </div>
 
                                 <div>
