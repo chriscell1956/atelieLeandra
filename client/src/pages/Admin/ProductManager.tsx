@@ -216,64 +216,72 @@ export const ProductManager: React.FC = () => {
 
             {/* Modal de Edição/Criação */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/60 flex items-start sm:items-center justify-center z-[60] overflow-y-auto p-0 sm:p-4">
-                    <div className="bg-white rounded-none sm:rounded-lg shadow-2xl w-full max-w-2xl animate-fade-in relative min-h-screen sm:min-h-0">
-                        <div className="bg-wood-700 text-white p-4 flex justify-between items-center sticky top-0 z-10 sm:rounded-t-lg">
+                <div className="fixed inset-0 bg-black/60 z-[60] flex flex-col items-center justify-center sm:p-4 backdrop-blur-sm">
+                    <div className="bg-white w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-2xl sm:rounded-lg shadow-2xl flex flex-col animate-fade-in">
+                        {/* Header */}
+                        <div className="bg-wood-800 text-white p-4 flex justify-between items-center shrink-0 sm:rounded-t-lg">
                             <h2 className="text-xl font-bold">{editingProduct ? 'Editar Produto' : 'Novo Produto'}</h2>
-                            <button onClick={() => setShowModal(false)} className="hover:bg-wood-600 p-2 rounded-full transition-colors"><X size={28} /></button>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="hover:bg-wood-700 p-2 rounded-full transition-colors"
+                            >
+                                <X size={24} />
+                            </button>
                         </div>
-                        <form onSubmit={handleSave} className="p-6 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Nome do Produto</label>
-                                    <input type="text" name="name" defaultValue={editingProduct?.name} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" required />
-                                </div>
 
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Descrição Detalhada</label>
-                                    <textarea name="description" rows={4} defaultValue={editingProduct?.description} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="Descreva os detalhes da peça, materiais usados, etc."></textarea>
-                                </div>
+                        {/* Scrollable Content */}
+                        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50">
+                            <form id="product-form" onSubmit={handleSave} className="space-y-5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Nome do Produto</label>
+                                        <input type="text" name="name" defaultValue={editingProduct?.name} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500 focus:border-wood-500" required placeholder="Ex: Imagem de Nossa Senhora" />
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Preço (R$)</label>
-                                    <input type="number" name="price" step="0.01" defaultValue={editingProduct?.price} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" required />
-                                </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Descrição</label>
+                                        <textarea name="description" rows={3} defaultValue={editingProduct?.description} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500 focus:border-wood-500" placeholder="Detalhes da peça..."></textarea>
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Categoria</label>
-                                    <select
-                                        name="category"
-                                        defaultValue={editingProduct?.category || "Geral"}
-                                        className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500"
-                                    >
-                                        <option value="Geral">Geral</option>
-                                        <option value="Decoração">Decoração</option>
-                                        <option value="Religioso">Religioso</option>
-                                        <option value="Casamento">Casamento</option>
-                                        <option value="Presentes">Presentes</option>
-                                    </select>
-                                </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Preço (R$)</label>
+                                        <input type="number" name="price" step="0.01" defaultValue={editingProduct?.price} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500" required />
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Quantidade em Estoque</label>
-                                    <input type="number" name="stock" defaultValue={editingProduct?.stock || 0} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" />
-                                </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Categoria</label>
+                                        <select
+                                            name="category"
+                                            defaultValue={editingProduct?.category || "Geral"}
+                                            className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500 bg-white"
+                                        >
+                                            <option value="Geral">Geral</option>
+                                            <option value="Decoração">Decoração</option>
+                                            <option value="Religioso">Religioso</option>
+                                            <option value="Casamento">Casamento</option>
+                                            <option value="Presentes">Presentes</option>
+                                        </select>
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Dimensões (Ex: 30x20cm)</label>
-                                    <input type="text" name="dimensions" defaultValue={editingProduct?.details?.dimensions} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" />
-                                </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Estoque (Unidades)</label>
+                                        <input type="number" name="stock" defaultValue={editingProduct?.stock || 0} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500" min="0" />
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Tempo de Produção</label>
-                                    <input type="text" name="productionTime" defaultValue={editingProduct?.details?.productionTime} className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-wood-500" placeholder="Ex: 5 dias úteis" />
-                                </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Dimensões</label>
+                                        <input type="text" name="dimensions" defaultValue={editingProduct?.details?.dimensions} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500" placeholder="Ex: 30x20cm" />
+                                    </div>
 
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-wood-800 mb-1">Imagem do Produto</label>
-                                    <div className="space-y-2">
+                                    <div>
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Tempo de Produção</label>
+                                        <input type="text" name="productionTime" defaultValue={editingProduct?.details?.productionTime} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500" placeholder="Ex: 5 dias" />
+                                    </div>
+
+                                    <div className="md:col-span-2 bg-white p-4 rounded-lg border border-wood-200">
+                                        <label className="block text-sm font-bold text-wood-800 mb-2">Imagem do Produto</label>
                                         <div className="flex items-center space-x-4">
-                                            <div className="w-24 h-24 bg-gray-100 rounded border border-gray-300 flex items-center justify-center overflow-hidden">
+                                            <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center overflow-hidden shrink-0">
                                                 {productData?.image_url ? (
                                                     <img
                                                         src={
@@ -289,40 +297,57 @@ export const ProductManager: React.FC = () => {
                                                         className="w-full h-full object-cover"
                                                     />
                                                 ) : (
-                                                    <ImageIcon className="text-gray-400" size={32} />
+                                                    <ImageIcon className="text-gray-400" size={24} />
                                                 )}
                                             </div>
-                                            <div className="flex-1">
+                                            <div className="flex-1 min-w-0">
                                                 <input
                                                     type="file"
                                                     accept="image/*"
                                                     onChange={handleImageChange}
-                                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-wood-100 file:text-wood-700 hover:file:bg-wood-200 cursor-pointer"
+                                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-100 file:text-wood-700 hover:file:bg-wood-200 cursor-pointer"
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">Carregue uma foto da galeria ou tire na hora.</p>
+                                                <p className="text-xs text-gray-400 mt-1 truncate">Formatos: JPG, PNG, WEBP</p>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="md:col-span-2">
-                                    <label className="flex items-center space-x-2 cursor-pointer bg-yellow-50 p-3 rounded border border-yellow-200">
-                                        <input
-                                            type="checkbox"
-                                            name="is_highlight"
-                                            defaultChecked={editingProduct?.is_highlight}
-                                            className="w-4 h-4 text-wood-600 rounded focus:ring-wood-500"
-                                        />
-                                        <span className="font-bold text-wood-800 text-sm">Exibir na Home como Destaque</span>
-                                    </label>
+                                    <div className="md:col-span-2">
+                                        <label className="flex items-center space-x-3 cursor-pointer p-4 rounded-lg border border-gold-200 bg-gold-50/50 hover:bg-gold-50 transition">
+                                            <input
+                                                type="checkbox"
+                                                name="is_highlight"
+                                                defaultChecked={editingProduct?.is_highlight}
+                                                className="w-5 h-5 text-wood-600 rounded focus:ring-wood-500 border-gray-300"
+                                            />
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-wood-800 text-sm">Destaque na Home</span>
+                                                <span className="text-xs text-wood-600">Este produto aparecerá no carrossel de destaques</span>
+                                            </div>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
+                        </div>
 
-                            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100 mt-6">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded md:w-auto w-full">Cancelar</button>
-                                <button type="submit" className="px-6 py-2 bg-wood-600 text-white rounded hover:bg-wood-700 font-bold shadow md:w-auto w-full">Salvar Produto</button>
-                            </div>
-                        </form>
+                        {/* Footer Buttons */}
+                        <div className="p-4 border-t border-gray-200 bg-white sm:rounded-b-lg shrink-0 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:space-x-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowModal(false)}
+                                className="px-5 py-3 text-wood-600 font-bold hover:bg-gray-100 rounded-lg transition-colors w-full sm:w-auto"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                form="product-form"
+                                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold shadow-md hover:shadow-lg transition-transform active:scale-95 w-full sm:w-auto flex items-center justify-center gap-2"
+                            >
+                                <Plus size={20} className="hidden sm:inline" />
+                                <span>{editingProduct ? 'Salvar Alterações' : 'Criar Produto'}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

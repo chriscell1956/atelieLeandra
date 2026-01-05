@@ -7,6 +7,7 @@ interface Product {
     price: number;
     image_url: string;
     description?: string;
+    stock?: number;
     details?: {
         dimensions?: string;
         material?: string;
@@ -23,7 +24,7 @@ interface ProductDetailsModalProps {
 export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ product, onClose, onAddToCart }) => {
     return (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col md:flex-row relative">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto md:overflow-hidden flex flex-col md:flex-row relative scrollbar-hide">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 bg-white/80 rounded-full p-2 hover:bg-white text-wood-800 z-10 transition shadow"
@@ -31,7 +32,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     <X size={24} />
                 </button>
 
-                <div className="md:w-1/2 h-96 md:h-auto bg-wood-100 relative">
+                <div className="md:w-1/2 h-64 md:h-auto bg-wood-100 relative shrink-0">
                     <img
                         src={product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url}
                         alt={product.name}
@@ -40,11 +41,24 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     />
                 </div>
 
-                <div className="md:w-1/2 p-8 flex flex-col">
+                <div className="md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
                     <div className="mb-auto">
                         <span className="text-wood-500 font-bold tracking-wider text-xs uppercase mb-2 block">Detalhes Exclusivos</span>
                         <h2 className="text-3xl font-bold text-wood-900 mb-4 font-serif">{product.name}</h2>
-                        <p className="text-xl font-bold text-wood-700 mb-6">R$ {product.price.toFixed(2).replace('.', ',')}</p>
+                        <div className="flex items-center space-x-4 mb-6">
+                            <p className="text-xl font-bold text-wood-700">R$ {product.price.toFixed(2).replace('.', ',')}</p>
+                            {product.stock !== undefined && (
+                                <span className={`text-sm font-bold px-3 py-1 rounded-full ${product.stock > 0
+                                        ? product.stock <= 5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
+                                        : 'bg-red-100 text-red-700'
+                                    }`}>
+                                    {product.stock > 0
+                                        ? `${product.stock} unidades disponíveis`
+                                        : 'Esgotado'
+                                    }
+                                </span>
+                            )}
+                        </div>
 
                         <p className="text-gray-600 mb-6 leading-relaxed">
                             {product.description || "Esta peça artesanal é única e feita com todo cuidado e carinho. Perfeita para decorar seu lar ou presentear alguém especial com um toque de devoção e arte."}
@@ -70,10 +84,14 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
 
                     <button
                         onClick={() => onAddToCart(product)}
-                        className="w-full bg-wood-800 text-gold-400 py-4 rounded-lg font-bold text-lg hover:bg-wood-900 transition flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform active:scale-95"
+                        disabled={product.stock !== undefined && product.stock <= 0}
+                        className={`w-full py-4 rounded-lg font-bold text-lg transition flex items-center justify-center space-x-2 shadow-lg ${product.stock !== undefined && product.stock <= 0
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-wood-800 text-gold-400 hover:bg-wood-900 hover:shadow-xl transform active:scale-95'
+                            }`}
                     >
                         <ShoppingCart />
-                        <span>Adicionar ao Carrinho</span>
+                        <span>{product.stock !== undefined && product.stock <= 0 ? 'Produto Esgotado' : 'Adicionar ao Carrinho'}</span>
                     </button>
                 </div>
             </div>
