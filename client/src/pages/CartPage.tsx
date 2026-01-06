@@ -21,30 +21,7 @@ export const CartPage: React.FC = () => {
 
     const finalTotal = total + (shippingQuote?.price || 0);
 
-    const handleCheckout = () => {
-        if (!shippingQuote) {
-            alert('Por favor, calcule o frete antes de finalizar.');
-            return;
-        }
 
-        const phoneNumber = "5518997075761";
-        const itemsList = items.map(item =>
-            `- ${item.quantity}x ${item.product.name} (R$ ${item.product.price.toFixed(2)})`
-        ).join('%0A');
-
-        const shippingText = `%0AFrete (CEP ${cep}): R$ ${shippingQuote.price.toFixed(2)} (${shippingQuote.days} dias)`;
-        const totalText = `%0A*Total Final: R$ ${finalTotal.toFixed(2)}*`;
-
-        const returnPolicyText = "Estou ciente do prazo de devolução de 7 dias.";
-
-        const message = `Olá! Gostaria de finalizar meu pedido no site:%0A%0A${itemsList}${shippingText}${totalText}%0A%0A${returnPolicyText}%0A%0AAguardo instruções para pagamento!`;
-
-        window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-
-        // Opcional: Limpar carrinho após ir para o WhatsApp
-        // clearCart(); 
-        setIsCheckout(true); // Mantem a tela de sucesso para feedback visual
-    };
 
     if (items.length === 0 && !isCheckout) {
         return (

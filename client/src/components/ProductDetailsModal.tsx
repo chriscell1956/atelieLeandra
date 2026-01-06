@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Clock, Ruler, ShoppingCart, MessageCircle } from 'lucide-react';
+import { X, Clock, Ruler, MessageCircle } from 'lucide-react';
 import { logVisit } from '../lib/supabase';
 
 interface Product {
@@ -22,7 +22,7 @@ interface ProductDetailsModalProps {
     onAddToCart: (product: Product) => void;
 }
 
-export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ product, onClose, onAddToCart }) => {
+export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ product, onClose }) => {
     useEffect(() => {
         logVisit(product);
     }, [product]);

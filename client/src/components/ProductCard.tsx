@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, Eye, MessageCircle } from 'lucide-react';
+import { Eye, MessageCircle } from 'lucide-react';
 
 interface Product {
     id: string;
@@ -14,10 +14,10 @@ interface Product {
 interface ProductCardProps {
     product: Product;
     onViewDetails: (product: Product) => void;
-    onAddToCart: (product: Product) => void;
+    onAddToCart: (product: Product) => void; // Keeping interface for now to specific minimal changes but removing from destructing below if unused, or just remove from interface too if I update usage in Home.tsx
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails, onAddToCart }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails }) => {
     return (
         <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-wood-100 group">
             <div className="relative h-64 overflow-hidden bg-wood-50">

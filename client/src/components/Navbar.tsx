@@ -1,15 +1,11 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User, Instagram } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { Menu, X, User, Instagram } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Navbar: React.FC = () => {
     const [isOpen, setIsOpen] = React.useState(false);
-    const { items } = useCart();
     const { user, logout } = useAuth();
-
-    const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
         <nav className="bg-wood-800 text-wood-50 shadow-lg sticky top-0 z-50">
