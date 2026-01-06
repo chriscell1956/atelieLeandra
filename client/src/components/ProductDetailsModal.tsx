@@ -23,12 +23,30 @@ interface ProductDetailsModalProps {
 }
 
 export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ product, onClose }) => {
+    const [isZoomed, setIsZoomed] = React.useState(false);
+
     useEffect(() => {
         logVisit(product);
     }, [product]);
 
     return (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
+            {isZoomed && (
+                <div
+                    className="fixed inset-0 z-[60] bg-black flex items-center justify-center p-4 cursor-zoom-out"
+                    onClick={() => setIsZoomed(false)}
+                >
+                    <img
+                        src={product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url}
+                        alt={product.name}
+                        className="max-w-full max-h-full object-contain"
+                    />
+                    <button className="absolute top-4 right-4 text-white p-2 bg-black/50 rounded-full hover:bg-black/70">
+                        <X size={32} />
+                    </button>
+                </div>
+            )}
+
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto md:overflow-hidden flex flex-col md:flex-row relative scrollbar-hide">
                 <button
                     onClick={onClose}
@@ -37,13 +55,19 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     <X size={24} />
                 </button>
 
-                <div className="md:w-1/2 h-64 md:h-auto bg-wood-100 relative shrink-0">
+                <div
+                    className="md:w-1/2 h-64 md:h-auto bg-wood-100 relative shrink-0 cursor-zoom-in group"
+                    onClick={() => setIsZoomed(true)}
+                >
                     <img
                         src={product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition duration-300 group-hover:brightness-90"
                         onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=Sem+Imagem' }}
                     />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
+                        <span className="bg-black/50 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">Clique para ampliar</span>
+                    </div>
                 </div>
 
                 <div className="md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
