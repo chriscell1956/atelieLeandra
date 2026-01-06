@@ -1,17 +1,33 @@
 import React, { useState } from 'react';
 import { Star, Send } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export const CashbackSystem: React.FC = () => {
     const [feedback, setFeedback] = useState('');
     const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate API call
-        setTimeout(() => {
+        setIsSubmitting(true);
+
+        const { error } = await supabase
+            .from('feedbacks')
+            .insert({
+                name: name || 'Anônimo',
+                email,
+                message: feedback
+            });
+
+        setIsSubmitting(false);
+
+        if (!error) {
             setSubmitted(true);
-        }, 1000);
+        } else {
+            alert('Erro ao enviar feedback. Tente novamente.');
+        }
     };
 
     if (submitted) {
@@ -37,6 +53,16 @@ export const CashbackSystem: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
+                    <label className="block text-wood-700 font-bold mb-1">Seu Nome</label>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full border border-wood-300 rounded p-2 focus:ring-2 focus:ring-gold-400 focus:border-transparent outline-none"
+                        placeholder="Como gostaria de ser chamado?"
+                    />
+                </div>
+                <div>
                     <label className="block text-wood-700 font-bold mb-1">Seu E-mail</label>
                     <input
                         type="email"
@@ -57,9 +83,9 @@ export const CashbackSystem: React.FC = () => {
                         placeholder="O que você achou dos nossos produtos?"
                     />
                 </div>
-                <button type="submit" className="w-full bg-wood-800 text-gold-400 font-bold py-3 rounded hover:bg-wood-900 transition flex items-center justify-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="w-full bg-wood-800 text-gold-400 font-bold py-3 rounded hover:bg-wood-900 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <Send size={20} />
-                    Enviar Avaliação
+                    {isSubmitting ? 'Enviando...' : 'Enviar Avaliação'}
                 </button>
             </form>
         </div>

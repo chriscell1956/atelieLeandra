@@ -100,60 +100,7 @@ export const Dashboard: React.FC = () => {
                 </header>
 
                 {activeTab === 'overview' && (
-                    <>
-                        {/* Stats Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <div className="bg-white p-6 rounded-lg shadow border border-wood-200">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-wood-600 font-bold uppercase text-sm tracking-wider">Vendas (Mês)</h3>
-                                    <div className="p-2 bg-green-100 text-green-600 rounded-full"><ShoppingCart size={20} /></div>
-                                </div>
-                                <p className="text-3xl font-bold text-wood-900">R$ 1.250,00</p>
-                                <p className="text-sm text-green-600 mt-2 font-semibold">+12% vs mês anterior</p>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-lg shadow border border-wood-200">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-wood-600 font-bold uppercase text-sm tracking-wider">Produtos</h3>
-                                    <div className="p-2 bg-blue-100 text-blue-600 rounded-full"><Package size={20} /></div>
-                                </div>
-                                <p className="text-3xl font-bold text-wood-900">45</p>
-                                <Link to="/admin/produtos" className="text-sm text-blue-600 hover:underline mt-2 inline-block">Gerenciar produtos</Link>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-lg shadow border border-wood-200">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-wood-600 font-bold uppercase text-sm tracking-wider">Clientes</h3>
-                                    <div className="p-2 bg-orange-100 text-orange-600 rounded-full"><Users size={20} /></div>
-                                </div>
-                                <p className="text-3xl font-bold text-wood-900">128</p>
-                                <button onClick={() => setActiveTab('clients')} className="text-sm text-orange-600 hover:underline mt-2">Ver lista</button>
-                            </div>
-                        </div>
-
-                        {/* Feedback Section */}
-                        <div className="bg-white border border-wood-200 rounded-lg p-6 shadow-sm">
-                            <h2 className="text-xl font-bold text-wood-800 mb-4">Feedbacks Recentes</h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead className="border-b border-wood-200 bg-wood-50">
-                                        <tr>
-                                            <th className="p-3 font-bold text-wood-700">Cliente</th>
-                                            <th className="p-3 font-bold text-wood-700">Mensagem</th>
-                                            <th className="p-3 font-bold text-wood-700">Avaliação</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-wood-100">
-                                        <tr>
-                                            <td className="p-3">Joana Dark</td>
-                                            <td className="p-3 italic text-gray-600">"Amei os produtos, acabamento impecável!"</td>
-                                            <td className="p-3 text-gold-500">★★★★★</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </>
+                    <OverviewTab />
                 )}
 
                 {activeTab === 'clients' && <ClientsView />}
@@ -194,6 +141,117 @@ export const Dashboard: React.FC = () => {
                 {activeTab === 'analytics' && <AnalyticsView />}
             </main>
         </div>
+    );
+};
+
+const OverviewTab = () => {
+    const [stats, setStats] = useState({
+        sales: 0,
+        products: 0,
+        clients: 0
+    });
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            setIsLoading(true);
+
+            // Fetch Products Count
+            const { count: productsCount } = await supabase
+                .from('products')
+                .select('*', { count: 'exact', head: true });
+
+            // Fetch Clients Count
+            const { count: clientsCount } = await supabase
+                .from('users')
+                .select('*', { count: 'exact', head: true });
+
+            // Fetch Feedbacks
+            const { data: feedbacksData } = await supabase
+                .from('feedbacks')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            setStats({
+                sales: 0, // Manually zeroed as requested
+                products: productsCount || 0,
+                clients: clientsCount || 0
+            });
+
+            if (feedbacksData) {
+                setFeedbacks(feedbacksData);
+            }
+            setIsLoading(false);
+        };
+
+        fetchStats();
+    }, []);
+
+    return (
+        <>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white p-6 rounded-lg shadow border border-wood-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-wood-600 font-bold uppercase text-sm tracking-wider">Vendas (Mês)</h3>
+                        <div className="p-2 bg-green-100 text-green-600 rounded-full"><ShoppingCart size={20} /></div>
+                    </div>
+                    <p className="text-3xl font-bold text-wood-900">R$ {stats.sales.toFixed(2).replace('.', ',')}</p>
+                    <p className="text-xs text-green-600 mt-2 font-semibold">Sem dados de vendas anteriores</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow border border-wood-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-wood-600 font-bold uppercase text-sm tracking-wider">Produtos</h3>
+                        <div className="p-2 bg-blue-100 text-blue-600 rounded-full"><Package size={20} /></div>
+                    </div>
+                    <p className="text-3xl font-bold text-wood-900">{stats.products}</p>
+                    <Link to="/admin/produtos" className="text-sm text-blue-600 hover:underline mt-2 inline-block">Gerenciar produtos</Link>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow border border-wood-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-wood-600 font-bold uppercase text-sm tracking-wider">Clientes</h3>
+                        <div className="p-2 bg-orange-100 text-orange-600 rounded-full"><Users size={20} /></div>
+                    </div>
+                    <p className="text-3xl font-bold text-wood-900">{stats.clients}</p>
+                    <span className="text-sm text-orange-600 mt-2 inline-block">Total Cadastrados</span>
+                </div>
+            </div>
+
+            {/* Feedback Section */}
+            <div className="bg-white border border-wood-200 rounded-lg p-6 shadow-sm">
+                <h2 className="text-xl font-bold text-wood-800 mb-4">Feedbacks Recentes</h2>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="border-b border-wood-200 bg-wood-50">
+                            <tr>
+                                <th className="p-3 font-bold text-wood-700">Cliente</th>
+                                <th className="p-3 font-bold text-wood-700">Mensagem</th>
+                                <th className="p-3 font-bold text-wood-700">Avaliação</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-wood-100">
+                            {isLoading ? (
+                                <tr><td colSpan={3} className="p-4 text-center text-gray-500">Carregando feedbacks...</td></tr>
+                            ) : feedbacks.length === 0 ? (
+                                <tr><td colSpan={3} className="p-4 text-center text-gray-500">Nenhum feedback recebido ainda.</td></tr>
+                            ) : (
+                                feedbacks.map((fb, idx) => (
+                                    <tr key={fb.id || idx}>
+                                        <td className="p-3 font-medium text-wood-900">{fb.name || 'Anônimo'}</td>
+                                        <td className="p-3 italic text-gray-600">"{fb.message}"</td>
+                                        <td className="p-3 text-gold-500">{'★'.repeat(fb.rating || 5)}</td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </>
     );
 };
 
