@@ -156,40 +156,7 @@ export const Dashboard: React.FC = () => {
                     </>
                 )}
 
-                {activeTab === 'clients' && (
-                    <div className="bg-white border border-wood-200 rounded-lg shadow-sm overflow-hidden">
-                        <table className="w-full text-left">
-                            <thead className="bg-wood-100 border-b border-wood-200">
-                                <tr>
-                                    <th className="p-4 font-bold text-wood-800">Nome</th>
-                                    <th className="p-4 font-bold text-wood-800">Email</th>
-                                    <th className="p-4 font-bold text-wood-800">Data Cadastro</th>
-                                    <th className="p-4 font-bold text-wood-800">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-wood-100">
-                                <tr className="hover:bg-gray-50">
-                                    <td className="p-4 font-medium">Maria Oliveira</td>
-                                    <td className="p-4 text-gray-600">maria@email.com</td>
-                                    <td className="p-4 text-gray-600">12/01/2024</td>
-                                    <td className="p-4"><span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">Ativo</span></td>
-                                </tr>
-                                <tr className="hover:bg-gray-50">
-                                    <td className="p-4 font-medium">João Silva</td>
-                                    <td className="p-4 text-gray-600">joao@email.com</td>
-                                    <td className="p-4 text-gray-600">10/01/2024</td>
-                                    <td className="p-4"><span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">Ativo</span></td>
-                                </tr>
-                                <tr className="hover:bg-gray-50">
-                                    <td className="p-4 font-medium">Ana Souza</td>
-                                    <td className="p-4 text-gray-600">ana.souza@email.com</td>
-                                    <td className="p-4 text-gray-600">05/01/2024</td>
-                                    <td className="p-4"><span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-bold">Inativo</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                {activeTab === 'clients' && <ClientsView />}
 
                 {activeTab === 'carousel' && (
                     <div className="space-y-6">
@@ -226,6 +193,61 @@ export const Dashboard: React.FC = () => {
 
                 {activeTab === 'analytics' && <AnalyticsView />}
             </main>
+        </div>
+    );
+};
+
+const ClientsView = () => {
+    const [clients, setClients] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchClients();
+    }, []);
+
+    const fetchClients = async () => {
+        setIsLoading(true);
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (!error && data) {
+            setClients(data);
+        }
+        setIsLoading(false);
+    };
+
+    return (
+        <div className="bg-white border border-wood-200 rounded-lg shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-wood-100 flex justify-between items-center">
+                <h3 className="font-bold text-wood-700">Lista de Clientes Cadastrados</h3>
+                <span className="bg-wood-100 text-wood-800 px-3 py-1 rounded-full text-sm font-bold">{clients.length} Total</span>
+            </div>
+            <table className="w-full text-left">
+                <thead className="bg-wood-100 border-b border-wood-200">
+                    <tr>
+                        <th className="p-4 font-bold text-wood-800">Nome</th>
+                        <th className="p-4 font-bold text-wood-800">Email</th>
+                        <th className="p-4 font-bold text-wood-800">Data Cadastro</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-wood-100">
+                    {isLoading ? (
+                        <tr><td colSpan={3} className="p-6 text-center text-gray-500">Carregando clientes...</td></tr>
+                    ) : clients.length === 0 ? (
+                        <tr><td colSpan={3} className="p-6 text-center text-gray-500">Nenhum cliente cadastrado ainda.</td></tr>
+                    ) : (
+                        clients.map(client => (
+                            <tr key={client.id} className="hover:bg-gray-50">
+                                <td className="p-4 font-medium text-wood-900">{client.name || 'Sem nome'}</td>
+                                <td className="p-4 text-gray-600">{client.email}</td>
+                                <td className="p-4 text-gray-600">{new Date(client.created_at).toLocaleDateString('pt-BR')}</td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
         </div>
     );
 };

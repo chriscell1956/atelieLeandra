@@ -15,6 +15,8 @@ import { CartProvider } from './context/CartContext';
 import { SiteContentProvider } from './context/SiteContentContext';
 import { WhatsAppButton } from './components/WhatsAppButton';
 
+import { Signup } from './pages/Signup';
+
 import { ProductsPage } from './pages/ProductsPage';
 
 function App() {
@@ -29,6 +31,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/cadastro" element={<Signup />} />
                   <Route path="/carrinho" element={<CartPage />} />
                   <Route path="/produtos" element={<ProductsPage />} />
                   <Route path="/contato" element={<Contact />} />

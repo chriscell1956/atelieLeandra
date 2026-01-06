@@ -69,8 +69,9 @@ export const Login: React.FC = () => {
                     </button>
                 </form>
 
-                <div className="mt-6 text-center">
-                    <a href="/" className="text-wood-600 hover:underline text-sm font-semibold">Voltar para o site</a>
+                <div className="mt-6 text-center space-y-2">
+                    <p className="text-sm">Não tem conta? <a href="/cadastro" className="text-wood-800 font-bold hover:underline">Cadastre-se</a></p>
+                    <a href="/" className="text-wood-600 hover:underline text-sm font-semibold block">Voltar para o site</a>
                 </div>
             </div>
         </div>
