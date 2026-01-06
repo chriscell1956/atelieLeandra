@@ -140,3 +140,10 @@ truncate table public.access_logs;
 -- Limpar todos os produtos (Isso apaga TUDO que você cadastrou)
 truncate table public.products cascade;
 ```
+
+## Atualização: Adicionar Telefone aos Clientes
+Para salvar o telefone dos clientes no cadastro, execute este comando:
+
+```sql
+alter table public.users add column phone text;
+```

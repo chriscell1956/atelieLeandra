@@ -12,7 +12,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     login: (email: string, password: string) => Promise<boolean | string>;
-    signup: (name: string, email: string, password: string) => Promise<boolean | string>;
+    signup: (name: string, email: string, password: string, phone: string) => Promise<boolean | string>;
     logout: () => void;
     isLoading: boolean;
 }
@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return error ? error.message : !!data.user;
     };
 
-    const signup = async (name: string, email: string, password: string) => {
+    const signup = async (name: string, email: string, password: string, phone: string) => {
         setIsLoading(true);
         const { data, error } = await supabase.auth.signUp({
             email,
@@ -84,7 +84,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .insert({
                     id: data.user.id,
                     email: email,
-                    name: name
+                    name: name,
+                    phone: phone
                 });
 
             if (profileError) console.error('Error creating profile:', profileError);

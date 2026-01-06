@@ -229,19 +229,21 @@ const ClientsView = () => {
                     <tr>
                         <th className="p-4 font-bold text-wood-800">Nome</th>
                         <th className="p-4 font-bold text-wood-800">Email</th>
+                        <th className="p-4 font-bold text-wood-800">Telefone</th>
                         <th className="p-4 font-bold text-wood-800">Data Cadastro</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-wood-100">
                     {isLoading ? (
-                        <tr><td colSpan={3} className="p-6 text-center text-gray-500">Carregando clientes...</td></tr>
+                        <tr><td colSpan={4} className="p-6 text-center text-gray-500">Carregando clientes...</td></tr>
                     ) : clients.length === 0 ? (
-                        <tr><td colSpan={3} className="p-6 text-center text-gray-500">Nenhum cliente cadastrado ainda.</td></tr>
+                        <tr><td colSpan={4} className="p-6 text-center text-gray-500">Nenhum cliente cadastrado ainda.</td></tr>
                     ) : (
                         clients.map(client => (
                             <tr key={client.id} className="hover:bg-gray-50">
                                 <td className="p-4 font-medium text-wood-900">{client.name || 'Sem nome'}</td>
                                 <td className="p-4 text-gray-600">{client.email}</td>
+                                <td className="p-4 text-gray-600">{client.phone || '-'}</td>
                                 <td className="p-4 text-gray-600">{new Date(client.created_at).toLocaleDateString('pt-BR')}</td>
                             </tr>
                         ))

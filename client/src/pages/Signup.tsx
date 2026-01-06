@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export const Signup: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { signup, isLoading } = useAuth();
@@ -13,7 +14,7 @@ export const Signup: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        const success = await signup(name, email, password);
+        const success = await signup(name, email, password, phone);
         if (success === true) {
             alert('Cadastro realizado com sucesso! Bem-vindo(a).');
             navigate('/');
@@ -45,6 +46,18 @@ export const Signup: React.FC = () => {
                             onChange={(e) => setName(e.target.value)}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-wood-500 focus:border-wood-500 outline-none transition"
                             placeholder="Seu nome"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-wood-800 font-bold mb-1 text-sm">WhatsApp / Telefone</label>
+                        <input
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-wood-500 focus:border-wood-500 outline-none transition"
+                            placeholder="(11) 99999-9999"
                             required
                         />
                     </div>
