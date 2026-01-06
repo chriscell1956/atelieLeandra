@@ -57,12 +57,7 @@ export const Navbar: React.FC = () => {
                                 </Link>
                             )}
 
-                            <Link to="/carrinho" className="p-1 rounded-full hover:bg-wood-700 focus:outline-none transition-colors relative">
-                                <ShoppingCart className="h-6 w-6" />
-                                {itemCount > 0 && (
-                                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">{itemCount}</span>
-                                )}
-                            </Link>
+
                         </div>
                     </div>
                     <div className="-mr-2 flex md:hidden">
@@ -104,10 +99,7 @@ export const Navbar: React.FC = () => {
                                     <span>Entrar (Admin)</span>
                                 </Link>
                             )}
-                            <Link to="/carrinho" onClick={() => setIsOpen(false)} className="hover:bg-wood-700 block px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2">
-                                <ShoppingCart size={20} />
-                                <span>Meu Carrinho ({itemCount})</span>
-                            </Link>
+
                         </div>
                     </div>
                 </div>

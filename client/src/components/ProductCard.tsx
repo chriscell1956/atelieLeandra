@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, Eye } from 'lucide-react';
+import { ShoppingCart, Eye, MessageCircle } from 'lucide-react';
 
 interface Product {
     id: string;
@@ -63,8 +63,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                         <button onClick={() => onViewDetails(product)} className="bg-white text-wood-800 p-3 rounded-full hover:bg-wood-100 transform hover:scale-110 transition shadow-lg" title="Ver Detalhes">
                             <Eye size={20} />
                         </button>
-                        <button onClick={() => onAddToCart(product)} className="bg-wood-600 text-white p-3 rounded-full hover:bg-wood-700 transform hover:scale-110 transition shadow-lg" title="Adicionar ao Carrinho">
-                            <ShoppingCart size={20} />
+                        <button onClick={() => {
+                            const message = `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
+                            const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
+                            window.open(url, '_blank');
+                        }} className="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transform hover:scale-110 transition shadow-lg" title="Comprar pelo WhatsApp">
+                            <MessageCircle size={20} />
                         </button>
                     </div>
                 )}

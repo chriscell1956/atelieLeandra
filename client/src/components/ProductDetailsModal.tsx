@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Clock, Ruler, ShoppingCart } from 'lucide-react';
+import { X, Clock, Ruler, ShoppingCart, MessageCircle } from 'lucide-react';
 import { logVisit } from '../lib/supabase';
 
 interface Product {
@@ -88,15 +88,19 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     </div>
 
                     <button
-                        onClick={() => onAddToCart(product)}
+                        onClick={() => {
+                            const message = `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
+                            const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
+                            window.open(url, '_blank');
+                        }}
                         disabled={product.stock !== undefined && product.stock <= 0}
                         className={`w-full py-4 rounded-lg font-bold text-lg transition flex items-center justify-center space-x-2 shadow-lg ${product.stock !== undefined && product.stock <= 0
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-wood-800 text-gold-400 hover:bg-wood-900 hover:shadow-xl transform active:scale-95'
+                            : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-xl transform active:scale-95'
                             }`}
                     >
-                        <ShoppingCart />
-                        <span>{product.stock !== undefined && product.stock <= 0 ? 'Produto Esgotado' : 'Adicionar ao Carrinho'}</span>
+                        <MessageCircle />
+                        <span>{product.stock !== undefined && product.stock <= 0 ? 'Produto Esgotado' : 'Comprar no WhatsApp'}</span>
                     </button>
                 </div>
             </div>
