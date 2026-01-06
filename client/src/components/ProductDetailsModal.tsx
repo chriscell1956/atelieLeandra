@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, Clock, Ruler, ShoppingCart } from 'lucide-react';
+import { logVisit } from '../lib/supabase';
 
 interface Product {
     id: string;
@@ -22,6 +23,10 @@ interface ProductDetailsModalProps {
 }
 
 export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ product, onClose, onAddToCart }) => {
+    useEffect(() => {
+        logVisit(product);
+    }, [product]);
+
     return (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto md:overflow-hidden flex flex-col md:flex-row relative scrollbar-hide">
@@ -49,8 +54,8 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                             <p className="text-xl font-bold text-wood-700">R$ {product.price.toFixed(2).replace('.', ',')}</p>
                             {product.stock !== undefined && (
                                 <span className={`text-sm font-bold px-3 py-1 rounded-full ${product.stock > 0
-                                        ? product.stock <= 5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
-                                        : 'bg-red-100 text-red-700'
+                                    ? product.stock <= 5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
+                                    : 'bg-red-100 text-red-700'
                                     }`}>
                                     {product.stock > 0
                                         ? `${product.stock} unidades disponíveis`
@@ -86,8 +91,8 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                         onClick={() => onAddToCart(product)}
                         disabled={product.stock !== undefined && product.stock <= 0}
                         className={`w-full py-4 rounded-lg font-bold text-lg transition flex items-center justify-center space-x-2 shadow-lg ${product.stock !== undefined && product.stock <= 0
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                : 'bg-wood-800 text-gold-400 hover:bg-wood-900 hover:shadow-xl transform active:scale-95'
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-wood-800 text-gold-400 hover:bg-wood-900 hover:shadow-xl transform active:scale-95'
                             }`}
                     >
                         <ShoppingCart />

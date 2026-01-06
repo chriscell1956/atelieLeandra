@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X, Plus } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X, Plus, BarChart2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { Link } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 
 export const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
@@ -62,6 +63,13 @@ export const Dashboard: React.FC = () => {
                     >
                         <Users size={20} />
                         <span>Clientes</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('analytics')}
+                        className={`flex items-center space-x-3 w-full p-3 rounded transition-colors ${activeTab === 'analytics' ? 'bg-wood-700 text-gold-400' : 'hover:bg-wood-700/50'}`}
+                    >
+                        <BarChart2 size={20} />
+                        <span>Relatórios e Visitas</span>
                     </button>
                     <button className="flex items-center space-x-3 w-full p-3 rounded transition-colors hover:bg-wood-700/50 opacity-50 cursor-not-allowed">
                         <ShoppingCart size={20} />
@@ -215,7 +223,71 @@ export const Dashboard: React.FC = () => {
                         </div>
                     </div>
                 )}
+
+                {activeTab === 'analytics' && <AnalyticsView />}
             </main>
+        </div>
+    );
+};
+
+const AnalyticsView = () => {
+    const [logs, setLogs] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchLogs();
+    }, []);
+
+    const fetchLogs = async () => {
+        setIsLoading(true);
+        const { data, error } = await supabase
+            .from('access_logs')
+            .select('*')
+            .order('visited_at', { ascending: false })
+            .limit(50);
+
+        if (!error && data) {
+            setLogs(data);
+        }
+        setIsLoading(false);
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow border border-wood-200">
+                <h3 className="text-xl font-bold text-wood-800 mb-4 flex items-center gap-2">
+                    <BarChart2 className="text-gold-500" />
+                    Últimas Visitas aos Produtos
+                </h3>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-wood-100 border-b border-wood-200">
+                            <tr>
+                                <th className="p-3 font-bold text-wood-700">Produto</th>
+                                <th className="p-3 font-bold text-wood-700">Data/Hora</th>
+                                <th className="p-3 font-bold text-wood-700">Visitante</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-wood-100">
+                            {isLoading ? (
+                                <tr><td colSpan={3} className="p-4 text-center">Carregando dados...</td></tr>
+                            ) : logs.length === 0 ? (
+                                <tr><td colSpan={3} className="p-4 text-center text-gray-500">Nenhuma visita registrada ainda.</td></tr>
+                            ) : (
+                                logs.map(log => (
+                                    <tr key={log.id} className="hover:bg-gray-50">
+                                        <td className="p-3 font-medium text-wood-900">{log.product_name || 'Produto Removido'}</td>
+                                        <td className="p-3 text-gray-600">{new Date(log.visited_at).toLocaleString('pt-BR')}</td>
+                                        <td className="p-3 text-gray-500 text-sm">
+                                            {log.user_email ? <span className="text-blue-600">{log.user_email}</span> : 'Anônimo'}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };
