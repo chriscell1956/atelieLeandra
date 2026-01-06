@@ -38,7 +38,7 @@ export const Navbar: React.FC = () => {
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6 space-x-4">
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-full hover:text-pink-400 transition-colors" title="Siga-nos no Instagram">
+                            <a href="https://www.instagram.com/leandraribeiroatelie?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="p-1 rounded-full hover:text-pink-400 transition-colors" title="Siga o Ateliê Leandra no Instagram">
                                 <Instagram className="h-6 w-6" />
                             </a>
 

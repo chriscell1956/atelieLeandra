@@ -14,7 +14,7 @@ export const Contact: React.FC = () => {
                     </p>
 
                     <div className="space-y-6">
-                        <div className="flex items-center space-x-4 group">
+                        <a href="mailto:leandraribeiro.lr.lr@gmail.com" className="flex items-center space-x-4 group hover:bg-wood-50 p-2 rounded-lg transition-all">
                             <div className="bg-gold-100 p-3 rounded-full text-gold-600 group-hover:bg-gold-500 group-hover:text-white transition-colors">
                                 <Mail size={24} />
                             </div>
@@ -22,29 +22,29 @@ export const Contact: React.FC = () => {
                                 <h3 className="font-bold text-wood-800 text-sm uppercase tracking-wider">E-mail</h3>
                                 <p className="text-wood-600">leandraribeiro.lr.lr@gmail.com</p>
                             </div>
-                        </div>
+                        </a>
 
-                        <div className="flex items-center space-x-4 group">
+                        <a href="https://wa.me/5518997075761?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20o%20Ateli%C3%AA!" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-4 group hover:bg-wood-50 p-2 rounded-lg transition-all">
                             <div className="bg-green-100 p-3 rounded-full text-green-600 group-hover:bg-green-500 group-hover:text-white transition-colors">
                                 <Phone size={24} />
                             </div>
                             <div>
                                 <h3 className="font-bold text-wood-800 text-sm uppercase tracking-wider">WhatsApp</h3>
-                                <p className="text-wood-600">Clique no botão lateral ou peça o número!</p>
+                                <p className="text-wood-600">(18) 99707-5761</p>
                             </div>
-                        </div>
+                        </a>
 
-                        <div className="flex items-center space-x-4 group">
+                        <a href="https://www.instagram.com/leandraribeiroatelie?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-4 group hover:bg-wood-50 p-2 rounded-lg transition-all">
                             <div className="bg-pink-100 p-3 rounded-full text-pink-600 group-hover:bg-pink-500 group-hover:text-white transition-colors">
                                 <Instagram size={24} />
                             </div>
                             <div>
                                 <h3 className="font-bold text-wood-800 text-sm uppercase tracking-wider">Instagram</h3>
-                                <p className="text-wood-600">@atelie_leandra</p>
+                                <p className="text-wood-600">@leandraribeiroatelie</p>
                             </div>
-                        </div>
+                        </a>
 
-                        <div className="flex items-center space-x-4 group">
+                        <a href="https://maps.app.goo.gl/kX7X7X7X7X7X7X7" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-4 group hover:bg-wood-50 p-2 rounded-lg transition-all cursor-default pointer-events-none opacity-80">
                             <div className="bg-blue-100 p-3 rounded-full text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                                 <MapPin size={24} />
                             </div>
@@ -52,7 +52,7 @@ export const Contact: React.FC = () => {
                                 <h3 className="font-bold text-wood-800 text-sm uppercase tracking-wider">Localização</h3>
                                 <p className="text-wood-600">Atendimento online e envios para todo o Brasil.</p>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
