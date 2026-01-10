@@ -121,10 +121,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                             const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
                             window.open(url, '_blank');
                         }}
-                        className={`w-full py-4 rounded-lg font-bold text-lg transition flex items-center justify-center space-x-2 shadow-lg ${product.stock !== undefined && product.stock <= 0
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'bg-green-600 text-white hover:bg-green-700'
-                            } hover:shadow-xl transform active:scale-95`}
+                        className="w-full py-4 rounded-lg font-bold text-lg transition flex items-center justify-center space-x-2 shadow-lg bg-green-600 text-white hover:bg-green-700 hover:shadow-xl transform active:scale-95"
                     >
                         <MessageCircle />
                         <span>{product.stock !== undefined && product.stock <= 0 ? 'Encomendar pelo WhatsApp' : 'Comprar no WhatsApp'}</span>

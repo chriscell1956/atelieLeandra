@@ -70,7 +70,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
 
                         const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
                         window.open(url, '_blank');
-                    }} className={`${product.stock !== undefined && product.stock <= 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white p-3 rounded-full transform hover:scale-110 transition shadow-lg`} title={product.stock !== undefined && product.stock <= 0 ? "Encomendar no WhatsApp" : "Comprar pelo WhatsApp"}>
+                    }} className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full transform hover:scale-110 transition shadow-lg" title={product.stock !== undefined && product.stock <= 0 ? "Encomendar no WhatsApp" : "Comprar pelo WhatsApp"}>
                         <MessageCircle size={20} />
                     </button>
                 </div>
