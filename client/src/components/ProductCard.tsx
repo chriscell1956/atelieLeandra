@@ -32,8 +32,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                     </div>
                 )}
                 {product.stock !== undefined && product.stock <= 0 && (
-                    <div className="absolute inset-0 bg-black/60 z-20 flex items-center justify-center">
-                        <span className="text-white font-bold text-xl border-2 border-white px-4 py-2 uppercase tracking-widest">Esgotado</span>
+                    <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded z-10 shadow-md">
+                        SOB ENCOMENDA
                     </div>
                 )}
                 <img
@@ -57,21 +57,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                     }}
                 />
 
-                {/* Overlay Buttons - Hide if out of stock */}
-                {(product.stock === undefined || product.stock > 0) && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-4 pointer-events-none group-hover:pointer-events-auto">
-                        <button onClick={() => onViewDetails(product)} className="bg-white text-wood-800 p-3 rounded-full hover:bg-wood-100 transform hover:scale-110 transition shadow-lg" title="Ver Detalhes">
-                            <Eye size={20} />
-                        </button>
-                        <button onClick={() => {
-                            const message = `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
-                            const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
-                            window.open(url, '_blank');
-                        }} className="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transform hover:scale-110 transition shadow-lg" title="Comprar pelo WhatsApp">
-                            <MessageCircle size={20} />
-                        </button>
-                    </div>
-                )}
+                {/* Overlay Buttons - Always show now */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-4 pointer-events-none group-hover:pointer-events-auto">
+                    <button onClick={() => onViewDetails(product)} className="bg-white text-wood-800 p-3 rounded-full hover:bg-wood-100 transform hover:scale-110 transition shadow-lg" title="Ver Detalhes">
+                        <Eye size={20} />
+                    </button>
+                    <button onClick={() => {
+                        const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+                        const message = isOutOfStock
+                            ? `Olá, vi o produto *${product.name}* (R$ ${product.price.toFixed(2)}) que está sob encomenda. Gostaria de saber o prazo de produção.`
+                            : `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
+
+                        const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
+                        window.open(url, '_blank');
+                    }} className={`${product.stock !== undefined && product.stock <= 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white p-3 rounded-full transform hover:scale-110 transition shadow-lg`} title={product.stock !== undefined && product.stock <= 0 ? "Encomendar no WhatsApp" : "Comprar pelo WhatsApp"}>
+                        <MessageCircle size={20} />
+                    </button>
+                </div>
             </div>
 
             <div className="p-4">
@@ -79,11 +81,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                 <h3 className="text-lg font-bold text-wood-900 mb-2 truncate" title={product.name}>{product.name}</h3>
                 <div className="flex justify-between items-center">
                     <span className="text-xl font-bold text-wood-700">R$ {product.price.toFixed(2).replace('.', ',')}</span>
-                    {product.stock !== undefined && product.stock > 0 && product.stock <= 5 && (
+                    {product.stock !== undefined && product.stock <= 0 ? (
+                        <span className="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded-full">
+                            Sob Encomenda
+                        </span>
+                    ) : product.stock !== undefined && product.stock > 0 && product.stock <= 5 ? (
                         <span className="text-xs text-red-600 font-bold bg-red-50 px-2 py-1 rounded-full">
                             Restam {product.stock}
                         </span>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </div>

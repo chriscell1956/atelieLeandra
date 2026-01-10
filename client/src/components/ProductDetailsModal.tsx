@@ -79,11 +79,11 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                             {product.stock !== undefined && (
                                 <span className={`text-sm font-bold px-3 py-1 rounded-full ${product.stock > 0
                                     ? product.stock <= 5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
-                                    : 'bg-red-100 text-red-700'
+                                    : 'bg-blue-100 text-blue-700'
                                     }`}>
                                     {product.stock > 0
                                         ? `${product.stock} unidades disponíveis`
-                                        : 'Esgotado'
+                                        : 'Sob Encomenda'
                                     }
                                 </span>
                             )}
@@ -113,18 +113,21 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
 
                     <button
                         onClick={() => {
-                            const message = `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
+                            const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+                            const message = isOutOfStock
+                                ? `Olá, vi o produto *${product.name}* (R$ ${product.price.toFixed(2)}) que está sob encomenda. Gostaria de saber o prazo de produção.`
+                                : `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
+
                             const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
                             window.open(url, '_blank');
                         }}
-                        disabled={product.stock !== undefined && product.stock <= 0}
                         className={`w-full py-4 rounded-lg font-bold text-lg transition flex items-center justify-center space-x-2 shadow-lg ${product.stock !== undefined && product.stock <= 0
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-xl transform active:scale-95'
-                            }`}
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-green-600 text-white hover:bg-green-700'
+                            } hover:shadow-xl transform active:scale-95`}
                     >
                         <MessageCircle />
-                        <span>{product.stock !== undefined && product.stock <= 0 ? 'Produto Esgotado' : 'Comprar no WhatsApp'}</span>
+                        <span>{product.stock !== undefined && product.stock <= 0 ? 'Encomendar pelo WhatsApp' : 'Comprar no WhatsApp'}</span>
                     </button>
                 </div>
             </div>
