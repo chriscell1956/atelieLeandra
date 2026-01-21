@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
+import { getImageUrl } from '../lib/imageHelper';
 
 export const HeroCarousel: React.FC = () => {
     const { slides } = useSiteContent();
@@ -47,7 +48,7 @@ export const HeroCarousel: React.FC = () => {
                 >
                     <div className="absolute inset-0 bg-black/40 z-20" />
                     <img
-                        src={slide.image || 'https://via.placeholder.com/1200x500?text=Feito+a+Mão'}
+                        src={getImageUrl(slide.image) || 'https://via.placeholder.com/1200x500?text=Feito+a+Mão'}
                         alt={slide.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {

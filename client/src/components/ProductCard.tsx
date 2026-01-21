@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, MessageCircle } from 'lucide-react';
+import { getImageUrl } from '../lib/imageHelper';
 
 interface Product {
     id: string;
@@ -37,15 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                     </div>
                 )}
                 <img
-                    src={
-                        product.image_url.startsWith('data:')
-                            ? product.image_url
-                            : product.image_url.startsWith('http')
-                                ? product.image_url
-                                : product.image_url.startsWith('/')
-                                    ? product.image_url
-                                    : `/${product.image_url}`
-                    }
+                    src={getImageUrl(product.image_url)}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
                     onClick={() => onViewDetails(product)}

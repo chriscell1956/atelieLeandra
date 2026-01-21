@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { X, Clock, Ruler, MessageCircle } from 'lucide-react';
 import { logVisit } from '../lib/supabase';
+import { getImageUrl } from '../lib/imageHelper';
 
 interface Product {
     id: string;
@@ -37,7 +38,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     onClick={() => setIsZoomed(false)}
                 >
                     <img
-                        src={product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url}
+                        src={getImageUrl(product.image_url)}
                         alt={product.name}
                         className="max-w-full max-h-full object-contain"
                     />
@@ -60,7 +61,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     onClick={() => setIsZoomed(true)}
                 >
                     <img
-                        src={product.image_url.startsWith('stores') ? `http://localhost:3000/${product.image_url}` : product.image_url}
+                        src={getImageUrl(product.image_url)}
                         alt={product.name}
                         className="w-full h-full object-cover transition duration-300 group-hover:brightness-90"
                         onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=Sem+Imagem' }}

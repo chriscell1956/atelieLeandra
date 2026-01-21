@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { getImageUrl } from '../../lib/imageHelper';
 
 // Types
 interface Product {
@@ -173,15 +174,7 @@ export const ProductManager: React.FC = () => {
                             <tr key={product.id} className="hover:bg-gray-50">
                                 <td className="p-4">
                                     <img
-                                        src={
-                                            product.image_url.startsWith('data:')
-                                                ? product.image_url
-                                                : product.image_url.startsWith('http')
-                                                    ? product.image_url
-                                                    : product.image_url.startsWith('/')
-                                                        ? product.image_url
-                                                        : `/${product.image_url}`
-                                        }
+                                        src={getImageUrl(product.image_url)}
                                         alt={product.name}
                                         className="w-12 h-12 rounded object-cover border border-wood-200"
                                         onError={(e) => {
@@ -284,15 +277,7 @@ export const ProductManager: React.FC = () => {
                                             <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center overflow-hidden shrink-0">
                                                 {productData?.image_url ? (
                                                     <img
-                                                        src={
-                                                            productData.image_url.startsWith('data:')
-                                                                ? productData.image_url
-                                                                : productData.image_url.startsWith('http')
-                                                                    ? productData.image_url
-                                                                    : productData.image_url.startsWith('/')
-                                                                        ? productData.image_url
-                                                                        : `/${productData.image_url}`
-                                                        }
+                                                        src={getImageUrl(productData.image_url)}
                                                         alt="Preview"
                                                         className="w-full h-full object-cover"
                                                     />
