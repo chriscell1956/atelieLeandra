@@ -5,12 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
 import { getImageUrl } from '../lib/imageHelper';
 
-// HeroCarousel.tsx
-import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSiteContent } from '../context/SiteContentContext';
-import { getImageUrl } from '../lib/imageHelper';
+
 
 export const HeroCarousel: React.FC = () => {
     const { slides } = useSiteContent();
