@@ -165,4 +165,18 @@ alter table public.feedbacks enable row level security;
 
 create policy "Todos podem criar feedbacks" on public.feedbacks for insert with check (true);
 create policy "Admin vê feedbacks" on public.feedbacks for select using (auth.role() = 'authenticated');
+
+## Correção: Erro ao Excluir Produto
+Se você receber um erro ao tentar excluir um produto (violates foreign key constraint), execute este comando para corrigir:
+
+```sql
+alter table public.access_logs
+drop constraint access_logs_product_id_fkey;
+
+alter table public.access_logs
+add constraint access_logs_product_id_fkey
+foreign key (product_id)
+references public.products(id)
+on delete cascade;
+```
 ```
