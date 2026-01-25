@@ -11,6 +11,7 @@ interface Product {
     category: string;
     is_highlight: boolean;
     image_url: string;
+    images?: string[];
     description?: string;
     stock?: number;
     details?: {
@@ -66,13 +67,32 @@ export const ProductManager: React.FC = () => {
             const isHighlight = (form.elements.namedItem('is_highlight') as HTMLInputElement)?.checked || false;
 
             // Use image from state (updated in handleImageChange) or existing product image
-            const imageUrl = productData.image_url || editingProduct?.image_url || 'https://via.placeholder.com/150';
+            // Prioritize the images array for the multi-image logic
+            const currentImages = productData.images || editingProduct?.images || [];
+
+            // Ensure image_url (main image) is consistent with images[0]
+            let imageUrl = productData.image_url || editingProduct?.image_url || '';
+
+            // If we have images in the array, the first one MUST be the main image_url
+            if (currentImages.length > 0 && currentImages[0]) {
+                imageUrl = currentImages[0];
+            } else if (imageUrl) {
+                // If we have an old image_url but empty array, populate array
+                if (currentImages.length === 0) {
+                    currentImages.push(imageUrl);
+                }
+            }
+
+            // Fallback for visual
+            if (!imageUrl) imageUrl = 'https://via.placeholder.com/150';
 
             const productToSave: any = {
                 id: editingProduct?.id || crypto.randomUUID(),
                 name,
                 price,
                 image_url: imageUrl,
+                images: currentImages.filter(img => img && img.length > 0), // Clean empty strings
+                category,
                 category,
                 is_highlight: isHighlight,
                 description,
@@ -133,12 +153,39 @@ export const ProductManager: React.FC = () => {
         }
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('A imagem deve ter no máximo 5MB');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProductData(prev => ({ ...prev, image_url: reader.result as string }));
+                const newImage = reader.result as string;
+
+                // Update images array at specific index
+                setProductData(prev => {
+                    const currentImages = [...(prev.images || editingProduct?.images || [])];
+                    if (index === 0) {
+                        // Main image update - ensures legacy compatibility
+                        return {
+                            ...prev,
+                            image_url: newImage,
+                            images: [newImage, ...(currentImages.slice(1))]
+                        };
+                    } else {
+                        // Auxiliary images
+                        // Ensure array is big enough
+                        while (currentImages.length <= index) {
+                            currentImages.push('');
+                        }
+                        currentImages[index] = newImage;
+                        // Filter out empty slots if any hole was created? No, keep index integrity for inputs
+                        return { ...prev, images: currentImages };
+                    }
+                });
             };
             reader.readAsDataURL(file);
         }
@@ -272,28 +319,49 @@ export const ProductManager: React.FC = () => {
                                     </div>
 
                                     <div className="md:col-span-2 bg-white p-4 rounded-lg border border-wood-200">
-                                        <label className="block text-sm font-bold text-wood-800 mb-2">Imagem do Produto</label>
-                                        <div className="flex items-center space-x-4">
-                                            <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center overflow-hidden shrink-0">
-                                                {productData?.image_url ? (
-                                                    <img
-                                                        src={getImageUrl(productData.image_url)}
-                                                        alt="Preview"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <ImageIcon className="text-gray-400" size={24} />
-                                                )}
+                                        <div>
+                                            <label className="block text-sm font-medium text-wood-700 mb-1">Imagens do Produto (Até 3)</label>
+                                            <div className="grid grid-cols-3 gap-4">
+                                                {[0, 1, 2].map((index) => {
+                                                    // Determine which image to show
+                                                    const currentImages = productData.images || editingProduct?.images || [];
+
+                                                    // Legacy fallback for index 0
+                                                    let imgSrc = '';
+                                                    if (index === 0) {
+                                                        imgSrc = productData.image_url || editingProduct?.image_url || currentImages[0];
+                                                    } else {
+                                                        imgSrc = currentImages[index];
+                                                    }
+
+                                                    return (
+                                                        <div key={index} className="flex flex-col items-center gap-2">
+                                                            <div className="w-full h-24 bg-gray-100 rounded border border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative">
+                                                                {imgSrc ? (
+                                                                    <img
+                                                                        src={getImageUrl(imgSrc)}
+                                                                        alt={`Foto ${index + 1}`}
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <ImageIcon className="text-gray-400" />
+                                                                )}
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={(e) => handleImageChange(e, index)}
+                                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                    title={`Alterar imagem ${index + 1}`}
+                                                                />
+                                                            </div>
+                                                            <span className="text-xs text-wood-600 font-medium">
+                                                                {index === 0 ? "Principal" : `Foto ${index + 1}`}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleImageChange}
-                                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-wood-100 file:text-wood-700 hover:file:bg-wood-200 cursor-pointer"
-                                                />
-                                                <p className="text-xs text-gray-400 mt-1 truncate">Formatos: JPG, PNG, WEBP</p>
-                                            </div>
+                                            <p className="text-xs text-gray-500 mt-1">Clique nas caixas para adicionar/alterar. A primeira é a capa.</p>
                                         </div>
                                     </div>
 

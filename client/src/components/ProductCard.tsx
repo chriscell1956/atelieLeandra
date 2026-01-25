@@ -7,6 +7,7 @@ interface Product {
     name: string;
     price: number;
     image_url: string;
+    images?: string[];
     is_highlight?: boolean;
     is_promotion?: boolean;
     stock?: number;

@@ -8,6 +8,8 @@ interface Product {
     name: string;
     price: number;
     image_url: string;
+    image_url: string;
+    images?: string[];
     description?: string;
     stock?: number;
     details?: {
@@ -25,6 +27,11 @@ interface ProductDetailsModalProps {
 
 export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ product, onClose }) => {
     const [isZoomed, setIsZoomed] = React.useState(false);
+    const [activeImage, setActiveImage] = React.useState(product.image_url);
+
+    useEffect(() => {
+        setActiveImage(product.image_url);
+    }, [product]);
 
     useEffect(() => {
         logVisit(product);
@@ -38,7 +45,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     onClick={() => setIsZoomed(false)}
                 >
                     <img
-                        src={getImageUrl(product.image_url)}
+                        src={getImageUrl(activeImage)}
                         alt={product.name}
                         className="max-w-full max-h-full object-contain"
                     />
@@ -61,7 +68,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     onClick={() => setIsZoomed(true)}
                 >
                     <img
-                        src={getImageUrl(product.image_url)}
+                        src={getImageUrl(activeImage)}
                         alt={product.name}
                         className="w-full h-full object-cover transition duration-300 group-hover:brightness-90"
                         onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=Sem+Imagem' }}
@@ -69,6 +76,25 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
                         <span className="bg-black/50 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">Clique para ampliar</span>
                     </div>
+
+                    {/* Image Gallery Thumbnails */}
+                    {product.images && product.images.length > 1 && (
+                        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 px-4 z-20" onClick={(e) => e.stopPropagation()}>
+                            {product.images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveImage(img)}
+                                    className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition shadow-lg ${activeImage === img ? 'border-gold-500 scale-110' : 'border-white/50 hover:border-white'}`}
+                                >
+                                    <img
+                                        src={getImageUrl(img)}
+                                        alt={`View ${idx}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
