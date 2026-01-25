@@ -47,10 +47,11 @@ export const HeroCarousel: React.FC = () => {
                     className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                 >
                     <div className="absolute inset-0 bg-black/40 z-20" />
+                    <div className="absolute inset-0 bg-black/90 z-0" /> {/* Dark background for contained images */}
                     <img
                         src={getImageUrl(slide.image) || 'https://via.placeholder.com/1200x500?text=Feito+a+Mão'}
                         alt={slide.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain relative z-10"
                         onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1200x500?text=Imagem+não+encontrada';
                         }}

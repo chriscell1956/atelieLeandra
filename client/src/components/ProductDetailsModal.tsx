@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Clock, Ruler, MessageCircle } from 'lucide-react';
+import { X, Clock, Ruler, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { logVisit } from '../lib/supabase';
 import { getImageUrl } from '../lib/imageHelper';
 
@@ -28,9 +28,51 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
     const [isZoomed, setIsZoomed] = React.useState(false);
     const [activeImage, setActiveImage] = React.useState(product.image_url);
 
+    const [touchStart, setTouchStart] = React.useState(0);
+    const [touchEnd, setTouchEnd] = React.useState(0);
+
+    const images = product.images && product.images.length > 0 ? product.images : [product.image_url];
+    const currentIndex = images.indexOf(activeImage);
+
     useEffect(() => {
         setActiveImage(product.image_url);
     }, [product]);
+
+    const handleNext = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        const nextIndex = (currentIndex + 1) % images.length;
+        setActiveImage(images[nextIndex]);
+    };
+
+    const handlePrev = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        const prevIndex = (currentIndex - 1 + images.length) % images.length;
+        setActiveImage(images[prevIndex]);
+    };
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > 50;
+        const isRightSwipe = distance < -50;
+
+        if (isLeftSwipe) {
+            handleNext();
+        }
+        if (isRightSwipe) {
+            handlePrev();
+        }
+        setTouchEnd(0); // Reset
+        setTouchStart(0);
+    };
 
     useEffect(() => {
         logVisit(product);
@@ -47,7 +89,37 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                         src={getImageUrl(activeImage)}
                         alt={product.name}
                         className="max-w-full max-h-full object-contain"
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                     />
+
+                    {images.length > 1 && (
+                        <>
+                            <button
+                                onClick={handlePrev}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-3 bg-black/50 rounded-full hover:bg-black/70 transition"
+                            >
+                                <ChevronLeft size={32} />
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-3 bg-black/50 rounded-full hover:bg-black/70 transition"
+                            >
+                                <ChevronRight size={32} />
+                            </button>
+
+                            {/* Dots indicator for mobile/desktop */}
+                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
+                                {images.map((_, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`w-2 h-2 rounded-full transition-all ${idx === currentIndex ? 'bg-white w-4' : 'bg-white/50'}`}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                     <button className="absolute top-4 right-4 text-white p-2 bg-black/50 rounded-full hover:bg-black/70">
                         <X size={32} />
                     </button>
@@ -69,7 +141,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     <img
                         src={getImageUrl(activeImage)}
                         alt={product.name}
-                        className="w-full h-full object-cover transition duration-300 group-hover:brightness-90"
+                        className="w-full h-full object-contain bg-wood-50 transition duration-300 group-hover:brightness-90"
                         onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=Sem+Imagem' }}
                     />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none">
