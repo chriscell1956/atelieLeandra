@@ -93,7 +93,6 @@ export const ProductManager: React.FC = () => {
                 image_url: imageUrl,
                 images: currentImages.filter(img => img && img.length > 0), // Clean empty strings
                 category,
-                category,
                 is_highlight: isHighlight,
                 description,
                 stock, // Add stock to payload
