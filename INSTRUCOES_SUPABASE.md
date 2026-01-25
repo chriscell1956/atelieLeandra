@@ -189,4 +189,13 @@ begin
   end if;
 end $$;
 ```
+
+## Nova Funcionalidade: Múltiplas Imagens (25/01/2026)
+Para permitir até 3 imagens por produto, precisamos criar uma coluna nova no banco de dados.
+Rode este comando no SQL Editor:
+
+```sql
+alter table public.products 
+add column if not exists images text[];
+```
 ```
