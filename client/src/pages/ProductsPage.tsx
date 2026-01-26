@@ -48,7 +48,7 @@ export const ProductsPage: React.FC = () => {
         alert(`Adicionado: ${product.name}`);
     };
 
-    const categories = ['Todos', 'Geral', 'Decoração', 'Religioso', 'Casamento', 'Presentes'];
+    const categories = ['Todos', 'Geral', 'Decoração', 'Religioso', 'Casamento', 'Presentes', 'Caixas'];
 
     return (
         <div className="px-4 py-8 max-w-7xl mx-auto">
@@ -61,8 +61,8 @@ export const ProductsPage: React.FC = () => {
                         key={cat}
                         onClick={() => setCategoryFilter(cat)}
                         className={`px-4 py-2 rounded-full font-bold transition ${categoryFilter === cat
-                                ? 'bg-wood-800 text-gold-400 shadow-md'
-                                : 'bg-wood-100 text-wood-600 hover:bg-wood-200'
+                            ? 'bg-wood-800 text-gold-400 shadow-md'
+                            : 'bg-wood-100 text-wood-600 hover:bg-wood-200'
                             }`}
                     >
                         {cat}
