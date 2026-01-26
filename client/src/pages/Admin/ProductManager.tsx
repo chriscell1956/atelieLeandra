@@ -299,6 +299,7 @@ export const ProductManager: React.FC = () => {
                                             <option value="Religioso">Religioso</option>
                                             <option value="Casamento">Casamento</option>
                                             <option value="Presentes">Presentes</option>
+                                            <option value="Caixas">Caixas</option>
                                         </select>
                                     </div>
 
