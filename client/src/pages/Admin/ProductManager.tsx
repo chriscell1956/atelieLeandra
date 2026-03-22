@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X, Image as ImageIcon } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase, uploadImage } from '../../lib/supabase';
 import { getImageUrl } from '../../lib/imageHelper';
 
 // Types
@@ -14,6 +14,7 @@ interface Product {
     images?: string[];
     description?: string;
     stock?: number;
+    code?: number;
     details?: {
         dimensions?: string;
         productionTime?: string;
@@ -26,6 +27,7 @@ export const ProductManager: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [productData, setProductData] = useState<Partial<Product>>({});
+    const [pendingFiles, setPendingFiles] = useState<(File | null)[]>([null, null, null]);
 
     // Mock initial data fetch
     // Fetch from Supabase on mount
@@ -64,38 +66,63 @@ export const ProductManager: React.FC = () => {
             const productionTime = (form.elements.namedItem('productionTime') as HTMLInputElement)?.value || '';
             const stockValue = (form.elements.namedItem('stock') as HTMLInputElement)?.value;
             const stock = stockValue ? parseInt(stockValue) : 0;
+            const codeValue = (form.elements.namedItem('code') as HTMLInputElement)?.value;
+            let code = codeValue ? parseInt(codeValue) : undefined;
             const isHighlight = (form.elements.namedItem('is_highlight') as HTMLInputElement)?.checked || false;
 
-            // Use image from state (updated in handleImageChange) or existing product image
-            // Prioritize the images array for the multi-image logic
-            const currentImages = productData.images || editingProduct?.images || [];
+            // Upload pending images first
+            const currentImages = [...(productData.images || editingProduct?.images || ['', '', ''])];
+            const finalImages = [...currentImages];
 
-            // Ensure image_url (main image) is consistent with images[0]
-            let imageUrl = productData.image_url || editingProduct?.image_url || '';
-
-            // If we have images in the array, the first one MUST be the main image_url
-            if (currentImages.length > 0 && currentImages[0]) {
-                imageUrl = currentImages[0];
-            } else if (imageUrl) {
-                // If we have an old image_url but empty array, populate array
-                if (currentImages.length === 0) {
-                    currentImages.push(imageUrl);
+            for (let i = 0; i < pendingFiles.length; i++) {
+                const file = pendingFiles[i];
+                if (file) {
+                    try {
+                        console.log(`Fazendo upload da imagem ${i + 1}...`);
+                        const url = await uploadImage(file);
+                        finalImages[i] = url;
+                    } catch (uploadErr) {
+                        console.error(`Erro no upload da imagem ${i + 1}:`, uploadErr);
+                        alert(`Erro ao carregar a imagem ${i + 1}. O salvamento foi cancelado.`);
+                        return;
+                    }
                 }
             }
 
-            // Fallback for visual
-            if (!imageUrl) imageUrl = 'https://via.placeholder.com/150';
+            // Ensure image_url (main image) is consistent with finalImages[0]
+            let imageUrl = finalImages[0] || 'https://via.placeholder.com/150';
+
+            // Logical for Product Code
+            if (!code && !editingProduct?.code) {
+                // Generate new code if it's a new product or doesn't have one
+                const { data: maxCodeData, error: maxCodeError } = await supabase
+                    .from('products')
+                    .select('code')
+                    .order('code', { ascending: false })
+                    .limit(1);
+
+                if (!maxCodeError) {
+                    const maxCode = maxCodeData?.[0]?.code || 100;
+                    code = Math.max(101, maxCode + 1);
+                } else {
+                    code = 101; // Fallback
+                }
+            } else if (!code && editingProduct?.code) {
+                // Keep existing code if editing and field is empty
+                code = editingProduct.code;
+            }
 
             const productToSave: any = {
                 id: editingProduct?.id || crypto.randomUUID(),
                 name,
                 price,
                 image_url: imageUrl,
-                images: currentImages.filter(img => img && img.length > 0), // Clean empty strings
+                images: finalImages.filter(img => img && img.length > 0),
                 category,
                 is_highlight: isHighlight,
                 description,
-                stock, // Add stock to payload
+                stock,
+                code, // Save the code
                 details: {
                     dimensions,
                     productionTime
@@ -123,6 +150,7 @@ export const ProductManager: React.FC = () => {
                 setShowModal(false);
                 setEditingProduct(null);
                 setProductData({});
+                setPendingFiles([null, null, null]);
                 alert('Produto salvo com sucesso!');
             }
         } catch (err) {
@@ -160,28 +188,28 @@ export const ProductManager: React.FC = () => {
                 return;
             }
 
+            // Store file for later upload
+            setPendingFiles(prev => {
+                const newFiles = [...prev];
+                newFiles[index] = file;
+                return newFiles;
+            });
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 const newImage = reader.result as string;
 
-                // Update images array at specific index
+                // Update images array at specific index for local PREVIEW
                 setProductData(prev => {
-                    const currentImages = [...(prev.images || editingProduct?.images || [])];
+                    const currentImages = [...(prev.images || editingProduct?.images || ['', '', ''])];
                     if (index === 0) {
-                        // Main image update - ensures legacy compatibility
                         return {
                             ...prev,
                             image_url: newImage,
                             images: [newImage, ...(currentImages.slice(1))]
                         };
                     } else {
-                        // Auxiliary images
-                        // Ensure array is big enough
-                        while (currentImages.length <= index) {
-                            currentImages.push('');
-                        }
                         currentImages[index] = newImage;
-                        // Filter out empty slots if any hole was created? No, keep index integrity for inputs
                         return { ...prev, images: currentImages };
                     }
                 });
@@ -195,7 +223,7 @@ export const ProductManager: React.FC = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <h1 className="text-2xl font-bold text-wood-800">Gerenciar Produtos</h1>
                 <button
-                    onClick={() => { setEditingProduct(null); setProductData({}); setShowModal(true); }}
+                    onClick={() => { setEditingProduct(null); setProductData({}); setPendingFiles([null, null, null]); setShowModal(true); }}
                     className="flex items-center justify-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full sm:w-auto shadow-lg font-bold"
                 >
                     <Plus size={24} />
@@ -208,6 +236,7 @@ export const ProductManager: React.FC = () => {
                     <thead className="bg-wood-100 border-b border-wood-200">
                         <tr>
                             <th className="p-4 font-bold text-wood-700">Imagem</th>
+                            <th className="p-4 font-bold text-wood-700">Código</th>
                             <th className="p-4 font-bold text-wood-700">Nome</th>
                             <th className="p-4 font-bold text-wood-700">Preço</th>
                             <th className="p-4 font-bold text-wood-700">Estoque</th>
@@ -231,6 +260,7 @@ export const ProductManager: React.FC = () => {
                                         }}
                                     />
                                 </td>
+                                <td className="p-4 font-bold text-wood-600">#{product.code || '---'}</td>
                                 <td className="p-4 font-medium">{product.name}</td>
                                 <td className="p-4">R$ {product.price.toFixed(2)}</td>
                                 <td className="p-4 font-semibold text-wood-800">{product.stock || 0} unid.</td>
@@ -306,6 +336,12 @@ export const ProductManager: React.FC = () => {
                                     <div>
                                         <label className="block text-sm font-bold text-wood-800 mb-1">Estoque (Unidades)</label>
                                         <input type="number" name="stock" defaultValue={editingProduct?.stock || 0} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500" min="0" />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold text-wood-800 mb-1">Código (Opcional)</label>
+                                        <input type="number" name="code" defaultValue={editingProduct?.code} className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500" placeholder="Ex: 5 (1-100 p/ favoritos)" />
+                                        <p className="text-[10px] text-wood-600 mt-1">Deixe vazio para gerar automaticamente {'>'} 100.</p>
                                     </div>
 
                                     <div>

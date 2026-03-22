@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
 import { ProductDetailsModal } from '../components/ProductDetailsModal';
 import { useCart } from '../context/CartContext';
@@ -10,6 +11,7 @@ export const ProductsPage: React.FC = () => {
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [categoryFilter, setCategoryFilter] = useState('Todos');
+    const [searchParams, setSearchParams] = useSearchParams();
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -36,6 +38,30 @@ export const ProductsPage: React.FC = () => {
             setFilteredProducts(data);
         }
         setIsLoading(false);
+    };
+
+    // Deep linking: Open product modal if ID is in URL
+    useEffect(() => {
+        const productId = searchParams.get('product');
+        if (productId) {
+            const fetchProductById = async () => {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('id', productId)
+                    .single();
+
+                if (!error && data) {
+                    setSelectedProduct(data);
+                }
+            };
+            fetchProductById();
+        }
+    }, [searchParams]);
+
+    const handleCloseModal = () => {
+        setSelectedProduct(null);
+        setSearchParams({}); // Clear query param
     };
 
     const handleAddToCart = (product: any) => {
@@ -94,8 +120,8 @@ export const ProductsPage: React.FC = () => {
             {selectedProduct && (
                 <ProductDetailsModal
                     product={selectedProduct}
-                    onClose={() => setSelectedProduct(null)}
-                    onAddToCart={(p) => { handleAddToCart(p); setSelectedProduct(null); }}
+                    onClose={handleCloseModal}
+                    onAddToCart={(p) => { handleAddToCart(p); handleCloseModal(); }}
                 />
             )}
         </div>

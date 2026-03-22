@@ -11,6 +11,7 @@ interface Product {
     is_highlight?: boolean;
     is_promotion?: boolean;
     stock?: number;
+    code?: number;
 }
 
 interface ProductCardProps {
@@ -58,9 +59,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                     </button>
                     <button onClick={() => {
                         const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+                        const codePrefix = product.code ? `[Ref: #${product.code}] ` : '';
                         const message = isOutOfStock
-                            ? `Olá, vi o produto *${product.name}* (R$ ${product.price.toFixed(2)}) que está sob encomenda. Gostaria de saber o prazo de produção.`
-                            : `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
+                            ? `Olá! Vi o produto *${product.name}* ${codePrefix}(R$ ${product.price.toFixed(2)}) que está sob encomenda. Gostaria de saber o prazo de produção.`
+                            : `Olá! Gostaria de saber mais sobre o produto: *${product.name}* ${codePrefix}(R$ ${product.price.toFixed(2)})`;
 
                         const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
                         window.open(url, '_blank');

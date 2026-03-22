@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Clock, Ruler, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Clock, Ruler, MessageCircle, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { logVisit } from '../lib/supabase';
 import { getImageUrl } from '../lib/imageHelper';
 
@@ -11,6 +11,7 @@ interface Product {
     images?: string[];
     description?: string;
     stock?: number;
+    code?: number;
     details?: {
         dimensions?: string;
         material?: string;
@@ -74,6 +75,36 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
         setTouchStart(0);
     };
 
+    const handleShare = async () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('product', product.id);
+        const shareUrl = url.toString();
+
+        const shareData = {
+            title: `Ateliê Leandra - ${product.name}`,
+            text: `Olha que lindo esse produto: ${product.name} (Ref: #${product.code})`,
+            url: shareUrl,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                if ((err as Error).name !== 'AbortError') {
+                    console.error('Error sharing:', err);
+                }
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                alert('Opa! Link copiado para você compartilhar.');
+            } catch (err) {
+                console.error('Clipboard error:', err);
+                alert('Não foi possível copiar o link.');
+            }
+        }
+    };
+
     useEffect(() => {
         logVisit(product);
     }, [product]);
@@ -127,12 +158,22 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
             )}
 
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto md:overflow-hidden flex flex-col md:flex-row relative scrollbar-hide">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 bg-white/80 rounded-full p-2 hover:bg-white text-wood-800 z-10 transition shadow"
-                >
-                    <X size={24} />
-                </button>
+                <div className="absolute top-4 right-4 flex space-x-2 z-10">
+                    <button
+                        onClick={handleShare}
+                        className="bg-white/80 rounded-full p-2 hover:bg-white text-wood-800 transition shadow hover:text-gold-600"
+                        title="Compartilhar"
+                    >
+                        <Share2 size={24} />
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="bg-white/80 rounded-full p-2 hover:bg-white text-wood-800 transition shadow hover:text-red-500"
+                        title="Fechar"
+                    >
+                        <X size={24} />
+                    </button>
+                </div>
 
                 <div
                     className="md:w-1/2 h-64 md:h-auto bg-wood-100 relative shrink-0 cursor-zoom-in group"
@@ -170,7 +211,9 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
 
                 <div className="md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
                     <div className="mb-auto">
-                        <span className="text-wood-500 font-bold tracking-wider text-xs uppercase mb-2 block">Detalhes Exclusivos</span>
+                        <span className="text-wood-500 font-bold tracking-wider text-xs uppercase mb-2 block">
+                            Artesanato Exclusivo {product.code && <span className="text-gold-600 ml-1"># {product.code}</span>}
+                        </span>
                         <h2 className="text-3xl font-bold text-wood-900 mb-4 font-serif">{product.name}</h2>
                         <div className="flex items-center space-x-4 mb-6">
                             <p className="text-xl font-bold text-wood-700">R$ {product.price.toFixed(2).replace('.', ',')}</p>
@@ -212,9 +255,10 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ produc
                     <button
                         onClick={() => {
                             const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+                            const codePrefix = product.code ? `[Ref: #${product.code}] ` : '';
                             const message = isOutOfStock
-                                ? `Olá, vi o produto *${product.name}* (R$ ${product.price.toFixed(2)}) que está sob encomenda. Gostaria de saber o prazo de produção.`
-                                : `Olá, gostaria de saber mais sobre o produto: *${product.name}* (R$ ${product.price.toFixed(2)})`;
+                                ? `Olá! Vi o produto *${product.name}* ${codePrefix}(R$ ${product.price.toFixed(2)}) que está sob encomenda. Gostaria de saber o prazo de produção.`
+                                : `Olá! Gostaria de saber mais sobre o produto: *${product.name}* ${codePrefix}(R$ ${product.price.toFixed(2)})`;
 
                             const url = `https://wa.me/5518997075761?text=${encodeURIComponent(message)}`;
                             window.open(url, '_blank');

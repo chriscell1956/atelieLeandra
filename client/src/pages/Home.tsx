@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { ProductCard } from '../components/ProductCard';
 import { CashbackSystem } from '../components/CashbackSystem';
@@ -10,6 +11,7 @@ export const Home: React.FC = () => {
     const [products, setProducts] = useState<any[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchParams, setSearchParams] = useSearchParams();
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -28,6 +30,30 @@ export const Home: React.FC = () => {
             setProducts(data);
         }
         setIsLoading(false);
+    };
+
+    // Deep linking: Open product modal if ID is in URL
+    useEffect(() => {
+        const productId = searchParams.get('product');
+        if (productId) {
+            const fetchProductById = async () => {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('id', productId)
+                    .single();
+
+                if (!error && data) {
+                    setSelectedProduct(data);
+                }
+            };
+            fetchProductById();
+        }
+    }, [searchParams]);
+
+    const handleCloseModal = () => {
+        setSelectedProduct(null);
+        setSearchParams({}); // Clear query param
     };
 
     const handleAddToCart = (product: any) => {
@@ -84,8 +110,8 @@ export const Home: React.FC = () => {
             {selectedProduct && (
                 <ProductDetailsModal
                     product={selectedProduct}
-                    onClose={() => setSelectedProduct(null)}
-                    onAddToCart={(p) => { handleAddToCart(p); setSelectedProduct(null); }}
+                    onClose={handleCloseModal}
+                    onAddToCart={(p) => { handleAddToCart(p); handleCloseModal(); }}
                 />
             )}
         </div>

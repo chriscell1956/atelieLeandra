@@ -190,12 +190,22 @@ begin
 end $$;
 ```
 
-## Nova Funcionalidade: Múltiplas Imagens (25/01/2026)
-Para permitir até 3 imagens por produto, precisamos criar uma coluna nova no banco de dados.
-Rode este comando no SQL Editor:
+```
+
+## Atualização: Códigos de Produtos (21/03/2026)
+Para ativar os códigos sequenciais e manuais, execute este comando no SQL Editor:
 
 ```sql
-alter table public.products 
-add column if not exists images text[];
-```
+alter table public.products add column if not exists code integer;
+
+-- Comando para dar códigos aos produtos existentes (101, 102...):
+with numbered_products as (
+  select id, 100 + row_number() over (order by created_at) as new_code
+  from public.products
+  where code is null
+)
+update public.products
+set code = numbered_products.new_code
+from numbered_products
+where public.products.id = numbered_products.id;
 ```
