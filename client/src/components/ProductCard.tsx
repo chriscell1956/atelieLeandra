@@ -39,6 +39,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
                         SOB ENCOMENDA
                     </div>
                 )}
+                {product.code && (
+                    <div className="absolute bottom-2 left-2 bg-black/20 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10 border border-white/10">
+                        #{product.code}
+                    </div>
+                )}
                 <img
                     src={getImageUrl(product.image_url)}
                     alt={product.name}
