@@ -81,9 +81,9 @@ export const ProductManager: React.FC = () => {
                         console.log(`Fazendo upload da imagem ${i + 1}...`);
                         const url = await uploadImage(file);
                         finalImages[i] = url;
-                    } catch (uploadErr) {
+                    } catch (uploadErr: any) {
                         console.error(`Erro no upload da imagem ${i + 1}:`, uploadErr);
-                        alert(`Erro ao carregar a imagem ${i + 1}. O salvamento foi cancelado.`);
+                        alert(`Erro ao carregar a imagem ${i + 1}: ${uploadErr.message || 'Erro desconhecido'}. O salvamento foi cancelado.`);
                         return;
                     }
                 }
