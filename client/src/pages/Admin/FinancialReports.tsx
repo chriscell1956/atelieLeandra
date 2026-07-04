@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, TrendingUp, DollarSign, Loader2 } from 'lucide-react';
+import { ArrowLeft, Trash2, DollarSign, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
 
