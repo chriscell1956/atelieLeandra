@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Image as ImageIcon, ArrowLeft } from 'lucide-react';
 import { supabase, uploadImage } from '../../lib/supabase';
 import { getImageUrl } from '../../lib/imageHelper';
+import { Link } from 'react-router-dom';
 
 // Types
 interface Product {
@@ -221,7 +222,12 @@ export const ProductManager: React.FC = () => {
     return (
         <div className="p-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
-                <h1 className="text-2xl font-bold text-wood-800">Gerenciar Produtos</h1>
+                <div className="flex items-center gap-4">
+                    <Link to="/admin" className="p-2 bg-wood-200 text-wood-800 rounded-full hover:bg-wood-300 transition-colors">
+                        <ArrowLeft size={20} />
+                    </Link>
+                    <h1 className="text-2xl font-bold text-wood-800">Gerenciar Produtos</h1>
+                </div>
                 <button
                     onClick={() => { setEditingProduct(null); setProductData({}); setPendingFiles([null, null, null]); setShowModal(true); }}
                     className="flex items-center justify-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full sm:w-auto shadow-lg font-bold"
