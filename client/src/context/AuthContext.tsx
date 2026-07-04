@@ -25,24 +25,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const formatUser = (sessionUser: any): User => ({
-        id: sessionUser.id,
-        email: sessionUser.email || '',
-        name: sessionUser.user_metadata?.name || 'Usuário',
-        role: sessionUser.email === ADMIN_EMAIL ? 'admin' : 'user'
-    });
+    const fetchUserProfile = async (sessionUser: any) => {
+        let name = sessionUser.user_metadata?.name;
+        
+        if (!name) {
+            const { data } = await supabase.from('users').select('name').eq('id', sessionUser.id).single();
+            if (data?.name) {
+                name = data.name;
+            }
+        }
+
+        setUser({
+            id: sessionUser.id,
+            email: sessionUser.email || '',
+            name: name || 'Usuário',
+            role: sessionUser.email === ADMIN_EMAIL ? 'admin' : 'user'
+        });
+    };
 
     // Check for existing session on mount
     React.useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.user) {
-                setUser(formatUser(session.user));
+                fetchUserProfile(session.user);
             }
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             if (session?.user) {
-                setUser(formatUser(session.user));
+                fetchUserProfile(session.user);
             } else {
                 setUser(null);
             }
