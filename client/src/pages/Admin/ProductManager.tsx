@@ -327,10 +327,10 @@ export const ProductManager: React.FC = () => {
                                         <label className="block text-sm font-bold text-wood-800 mb-1">Categoria</label>
                                         <select
                                             name="category"
-                                            defaultValue={editingProduct?.category || "Maternidade"}
+                                            defaultValue={editingProduct?.category || "Linha Baby"}
                                             className="w-full border border-wood-300 rounded-lg p-3 focus:ring-2 focus:ring-wood-500 bg-white"
                                         >
-                                            <option value="Maternidade">Maternidade</option>
+                                            <option value="Linha Baby">Linha Baby</option>
                                             <option value="Decoração">Decoração</option>
                                             <option value="Religioso">Religioso</option>
                                             <option value="Casamento">Casamento</option>
