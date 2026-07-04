@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, PackagePlus, Receipt, Search, Upload, Loader2 } from 'lucide-react';
+import { ArrowLeft, PackagePlus, Receipt, Search, Upload, Loader2, Camera } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
 
@@ -302,11 +302,16 @@ export const MaterialsManager: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Foto do Produto (Opcional)</label>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   {photoUrl && <img src={photoUrl} alt="Preview" className="w-16 h-16 object-cover rounded-md border" />}
-                  <label className="cursor-pointer bg-wood-100 px-4 py-2 rounded-md hover:bg-wood-200 flex items-center gap-2 text-sm text-wood-800 transition-colors">
+                  <label className="cursor-pointer bg-wood-100 px-3 py-2 rounded-md hover:bg-wood-200 flex items-center gap-2 text-sm text-wood-800 transition-colors">
+                    {isUploading ? <Loader2 className="animate-spin" size={16} /> : <Camera size={16} />}
+                    <span className="hidden sm:inline">{isUploading ? 'Enviando...' : 'Câmera'}</span>
+                    <input type="file" accept="image/*" capture="environment" onChange={handleImageUpload} className="hidden" disabled={isUploading} />
+                  </label>
+                  <label className="cursor-pointer bg-wood-100 px-3 py-2 rounded-md hover:bg-wood-200 flex items-center gap-2 text-sm text-wood-800 transition-colors">
                     {isUploading ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
-                    {isUploading ? 'Enviando...' : 'Escolher Foto'}
+                    <span className="hidden sm:inline">{isUploading ? 'Enviando...' : 'Galeria'}</span>
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading} />
                   </label>
                 </div>
