@@ -24,12 +24,16 @@ export const MaterialsManager: React.FC = () => {
   
   const [selectedMaterial, setSelectedMaterial] = useState<RawMaterial | null>(null);
 
-  // Form states for New Material
   const [name, setName] = useState('');
   const [unit, setUnit] = useState('unidade');
   const [unitSize, setUnitSize] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState('');
+  
+  // Optional initial purchase data
+  const [initialPrice, setInitialPrice] = useState('');
+  const [initialQuantity, setInitialQuantity] = useState('1');
+  const [initialSupplier, setInitialSupplier] = useState('');
 
   // Form states for New Purchase
   const [price, setPrice] = useState('');
@@ -81,20 +85,38 @@ export const MaterialsManager: React.FC = () => {
     e.preventDefault();
     if (!name) return;
 
-    const { error } = await supabase.from('raw_materials').insert([{
+    let cost = 0;
+    if (initialPrice && initialQuantity) {
+      cost = parseFloat(initialPrice) / parseFloat(initialQuantity);
+    }
+
+    const { data: newMaterial, error } = await supabase.from('raw_materials').insert([{
       name,
       unit,
       unit_size: unitSize ? parseFloat(unitSize) : null,
       photo_url: photoUrl || null,
-    }]);
+      last_cost: cost,
+      last_supplier: initialSupplier || null
+    }]).select().single();
 
     if (error) {
       alert('Erro ao salvar insumo: ' + error.message);
-    } else {
-      setShowAddModal(false);
-      resetForms();
-      fetchMaterials();
+      return;
     }
+
+    // Se informou preço, já cria a primeira nota fiscal (compra)
+    if (newMaterial && initialPrice && initialQuantity) {
+      await supabase.from('purchases').insert([{
+        material_id: newMaterial.id,
+        price: parseFloat(initialPrice),
+        quantity: parseFloat(initialQuantity),
+        supplier: initialSupplier || null
+      }]);
+    }
+
+    setShowAddModal(false);
+    resetForms();
+    fetchMaterials();
   };
 
   const handleAddPurchase = async (e: React.FormEvent) => {
@@ -137,6 +159,9 @@ export const MaterialsManager: React.FC = () => {
     setUnit('unidade');
     setUnitSize('');
     setPhotoUrl('');
+    setInitialPrice('');
+    setInitialQuantity('1');
+    setInitialSupplier('');
     setPrice('');
     setQuantity('1');
     setSupplier('');
@@ -286,6 +311,26 @@ export const MaterialsManager: React.FC = () => {
                   </label>
                 </div>
               </div>
+
+              <hr className="my-4 border-gray-200" />
+              <h3 className="text-sm font-bold text-wood-800 mb-2">Primeira Compra (Opcional)</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Preço Total Pago (R$)</label>
+                  <input type="number" step="0.01" min="0" value={initialPrice} onChange={e => setInitialPrice(e.target.value)} className="w-full border-gray-300 rounded-md focus:ring-gold-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Qtd. Comprada</label>
+                  <input type="number" step="0.01" min="0.01" value={initialQuantity} onChange={e => setInitialQuantity(e.target.value)} className="w-full border-gray-300 rounded-md focus:ring-gold-500" placeholder="1" />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Local da Compra / Fornecedor</label>
+                <input type="text" value={initialSupplier} onChange={e => setInitialSupplier(e.target.value)} className="w-full border-gray-300 rounded-md focus:ring-gold-500" placeholder="Ex: Shopee, Papelaria Central..." />
+              </div>
+
               <div className="flex gap-2 justify-end pt-4">
                 <button type="button" onClick={() => { setShowAddModal(false); resetForms(); }} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">Cancelar</button>
                 <button type="submit" disabled={isUploading} className="px-4 py-2 bg-gold-500 text-wood-900 rounded-md hover:bg-gold-600 font-medium">Salvar Insumo</button>
