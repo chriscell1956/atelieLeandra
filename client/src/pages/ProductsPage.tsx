@@ -74,7 +74,7 @@ export const ProductsPage: React.FC = () => {
         alert(`Adicionado: ${product.name}`);
     };
 
-    const categories = ['Todos', 'Geral', 'Decoração', 'Religioso', 'Casamento', 'Presentes', 'Caixas'];
+    const categories = ['Todos', 'Maternidade', 'Decoração', 'Religioso', 'Casamento', 'Presentes', 'Caixas'];
 
     return (
         <div className="px-4 py-8 max-w-7xl mx-auto">
