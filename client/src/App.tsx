@@ -8,6 +8,9 @@ import { Contact } from './pages/Contact';
 import { About } from './pages/About';
 import { Dashboard } from './pages/Admin/Dashboard';
 import { ProductManager } from './pages/Admin/ProductManager';
+import { MaterialsManager } from './pages/Admin/MaterialsManager';
+import { ShoppingList } from './pages/Admin/ShoppingList';
+import { FinancialReports } from './pages/Admin/FinancialReports';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 import { CartProvider } from './context/CartContext';
@@ -41,6 +44,9 @@ function App() {
                   <Route path="/admin" element={<ProtectedRoute />}>
                     <Route index element={<Dashboard />} />
                     <Route path="produtos" element={<ProductManager />} />
+                    <Route path="insumos" element={<MaterialsManager />} />
+                    <Route path="lista-compras" element={<ShoppingList />} />
+                    <Route path="financeiro" element={<FinancialReports />} />
                   </Route>
                 </Routes>
               </div>

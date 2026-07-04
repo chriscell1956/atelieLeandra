@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X, Plus, BarChart2 } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Power, ArrowLeft, Image as ImageIcon, X, Plus, BarChart2, BookOpen, ListTodo, DollarSign } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { Link } from 'react-router-dom';
@@ -49,6 +49,30 @@ export const Dashboard: React.FC = () => {
                     >
                         <Package size={20} />
                         <span>Produtos</span>
+                    </Link>
+                    <Link
+                        to="/admin/insumos"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className={`flex items-center space-x-3 w-full p-3 rounded transition-colors hover:bg-wood-700/50`}
+                    >
+                        <BookOpen size={20} />
+                        <span>Estoque de Insumos</span>
+                    </Link>
+                    <Link
+                        to="/admin/lista-compras"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className={`flex items-center space-x-3 w-full p-3 rounded transition-colors hover:bg-wood-700/50`}
+                    >
+                        <ListTodo size={20} />
+                        <span>Lista de Compras</span>
+                    </Link>
+                    <Link
+                        to="/admin/financeiro"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className={`flex items-center space-x-3 w-full p-3 rounded transition-colors hover:bg-wood-700/50`}
+                    >
+                        <DollarSign size={20} />
+                        <span>Custos e Receitas</span>
                     </Link>
                     <button
                         onClick={() => setActiveTab('carousel')}
