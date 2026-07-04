@@ -93,7 +93,7 @@ export const ShoppingList: React.FC = () => {
           <h1 className="text-3xl font-bold text-wood-900">Montar Lista</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 border border-wood-100 h-[calc(100vh-200px)] flex flex-col">
+        <div className="bg-white rounded-lg shadow-md p-6 border border-wood-100 h-[500px] md:h-[calc(100vh-200px)] flex flex-col">
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -133,7 +133,7 @@ export const ShoppingList: React.FC = () => {
 
       {/* Direita: A Lista de Compras */}
       <div className="w-full md:w-1/2">
-        <div className="bg-white rounded-lg shadow-md border border-wood-100 h-[calc(100vh-140px)] flex flex-col mt-14 md:mt-0">
+        <div className="bg-white rounded-lg shadow-md border border-wood-100 h-[500px] md:h-[calc(100vh-140px)] flex flex-col mt-4 md:mt-0">
           <div className="p-4 border-b border-wood-100 bg-wood-50 rounded-t-lg">
             <h2 className="text-xl font-bold text-wood-900">Sua Lista de Compras</h2>
             <p className="text-sm text-wood-600">{shoppingList.length} itens selecionados</p>

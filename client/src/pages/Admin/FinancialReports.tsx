@@ -117,7 +117,7 @@ export const FinancialReports: React.FC = () => {
           <h1 className="text-3xl font-bold text-wood-900">Margem e Receitas</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md border border-wood-100 h-[calc(100vh-200px)] flex flex-col">
+        <div className="bg-white rounded-lg shadow-md border border-wood-100 h-[400px] md:h-[calc(100vh-200px)] flex flex-col">
           <div className="p-4 border-b border-wood-100 bg-wood-50">
             <h2 className="font-bold text-wood-900">Seus Produtos</h2>
             <p className="text-sm text-gray-500">Selecione para ver o custo real</p>
@@ -156,23 +156,23 @@ export const FinancialReports: React.FC = () => {
         ) : (
           <div className="bg-white rounded-lg shadow-md border border-wood-100 overflow-hidden">
             {/* Header de Resumo */}
-            <div className="p-6 bg-wood-800 text-white flex justify-between items-center">
+            <div className="p-6 bg-wood-800 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
               <div>
                 <h2 className="text-2xl font-bold">{selectedProduct.name}</h2>
                 <p className="text-wood-300">Resumo Financeiro</p>
               </div>
               
-              <div className="flex gap-6 text-right">
-                <div>
-                  <p className="text-wood-400 text-sm">Custo (Insumos)</p>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 text-left sm:text-right w-full sm:w-auto">
+                <div className="flex justify-between sm:block">
+                  <p className="text-wood-400 text-sm sm:mb-1">Custo (Insumos)</p>
                   <p className="text-xl font-bold text-red-400">R$ {calculateTotalCost(recipe).toFixed(2)}</p>
                 </div>
-                <div>
-                  <p className="text-wood-400 text-sm">Preço de Venda</p>
+                <div className="flex justify-between sm:block">
+                  <p className="text-wood-400 text-sm sm:mb-1">Preço de Venda</p>
                   <p className="text-xl font-bold text-green-400">R$ {selectedProduct.price.toFixed(2)}</p>
                 </div>
-                <div className="pl-6 border-l border-wood-600">
-                  <p className="text-wood-400 text-sm">Lucro Bruto</p>
+                <div className="pt-2 sm:pt-0 sm:pl-6 border-t sm:border-t-0 sm:border-l border-wood-600 flex justify-between sm:block">
+                  <p className="text-wood-400 text-sm sm:mb-1">Lucro Bruto</p>
                   <p className="text-2xl font-bold text-gold-400">
                     R$ {(selectedProduct.price - calculateTotalCost(recipe)).toFixed(2)}
                   </p>
@@ -184,13 +184,13 @@ export const FinancialReports: React.FC = () => {
             <div className="p-6">
               <h3 className="text-lg font-bold text-wood-900 mb-4">Ficha Técnica (Insumos Gastos)</h3>
               
-              <form onSubmit={addMaterialToRecipe} className="flex items-end gap-4 mb-6 bg-wood-50 p-4 rounded-md">
-                <div className="flex-1">
+              <form onSubmit={addMaterialToRecipe} className="flex flex-col sm:flex-row items-start sm:items-end gap-4 mb-6 bg-wood-50 p-4 rounded-md">
+                <div className="flex-1 w-full">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Buscar Insumo Cadastrado</label>
                   <select 
                     value={selectedMaterialId} 
                     onChange={e => setSelectedMaterialId(e.target.value)}
-                    className="w-full border-gray-300 rounded-md"
+                    className="w-full border-gray-300 rounded-md bg-white"
                     required
                   >
                     <option value="">Selecione...</option>
@@ -199,8 +199,8 @@ export const FinancialReports: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Quantidade Usada</label>
+                <div className="w-full sm:w-auto">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Qtd Usada</label>
                   <div className="flex items-center gap-2">
                     <input 
                       type="number" 
@@ -209,19 +209,19 @@ export const FinancialReports: React.FC = () => {
                       required
                       value={quantityUsed} 
                       onChange={e => setQuantityUsed(e.target.value)}
-                      className="w-24 border-gray-300 rounded-md"
+                      className="w-full sm:w-24 border-gray-300 rounded-md"
                     />
                     <span className="text-sm text-gray-500 w-8">
                       {selectedMaterialId ? materials.find(m => m.id === selectedMaterialId)?.unit : ''}
                     </span>
                   </div>
                 </div>
-                <button type="submit" className="bg-gold-500 text-wood-900 px-4 py-2 rounded-md font-semibold hover:bg-gold-600">
+                <button type="submit" className="w-full sm:w-auto bg-gold-500 text-wood-900 px-4 py-2 rounded-md font-semibold hover:bg-gold-600">
                   Adicionar
                 </button>
               </form>
 
-              <div className="border border-wood-200 rounded-md">
+              <div className="border border-wood-200 rounded-md overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>

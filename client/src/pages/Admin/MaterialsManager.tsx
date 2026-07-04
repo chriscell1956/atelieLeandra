@@ -174,7 +174,7 @@ export const MaterialsManager: React.FC = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-8">
         <div className="flex items-center gap-4">
           <Link to="/admin" className="p-2 bg-wood-200 text-wood-800 rounded-full hover:bg-wood-300">
             <ArrowLeft size={20} />
@@ -302,7 +302,7 @@ export const MaterialsManager: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Foto do Produto (Opcional)</label>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                   {photoUrl && <img src={photoUrl} alt="Preview" className="w-16 h-16 object-cover rounded-md border" />}
                   <label className="cursor-pointer bg-wood-100 px-3 py-2 rounded-md hover:bg-wood-200 flex items-center gap-2 text-sm text-wood-800 transition-colors">
                     {isUploading ? <Loader2 className="animate-spin" size={16} /> : <Camera size={16} />}
